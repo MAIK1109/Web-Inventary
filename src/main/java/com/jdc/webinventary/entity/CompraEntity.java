@@ -1,7 +1,6 @@
 package com.jdc.webinventary.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 
@@ -10,4 +9,9 @@ import java.io.Serializable;
 public class CompraEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idcompra")
+    private Integer idCompra;
 }
