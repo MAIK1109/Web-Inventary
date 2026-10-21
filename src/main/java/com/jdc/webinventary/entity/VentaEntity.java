@@ -12,8 +12,8 @@ public class VentaEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idproducto")
-    private Integer idProducto;
+    @Column(name = "idVenta")
+    private Integer idVenta;
 
 
 }
