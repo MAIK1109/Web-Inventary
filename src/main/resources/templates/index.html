@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es-es">
+<head th:replace="~{Layout/layout :: head('Inicio')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<div class = "page-content">
+    <h1>Bienvenido a desarrollo de Software II</h1>
+
+    <p>Lo que para uno es magia, para otro es ingeniería</p>
+    <img th:src="@{/images/boostrap.jpg}" alt="imag Boo" style="width: 50%; border-radius: 20px">
+
+</div>
+<div class = "card" style ="80%">
+    <div class="card-header">
+        Pagina de prueba
+    </div>
+    <div class="card-body">
+        <h5 class = "card-title">Historia JDC </h5>
+        <p class="card-text">La Fundación Universitaria Juan de Castellanos es una institución privada de educación superior de la ciudad de Tunja, en Colombia, que cuenta con un sistema de gestión de la calidad; cuyo nombre es en honor al sacerdote español Juan de Castellanos, fallecido en la ciudad de Tunja.</p>
+        <a href="https://www.jdc.edu.co/" class="btn btn-primary"> visita la Juan</a>
+    </div>
+
+</div>
+
+</body>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</html>
