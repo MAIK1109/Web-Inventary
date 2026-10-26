@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Registrar cliente')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+
+<main style="max-width: 600px; margin: 2rem auto; padding: 1.5rem;">
+    <h1>Registrar cliente</h1>
+    <p>Registra los datos de contacto del cliente. El consentimiento para enviar comprobantes es opcional.</p>
+    <p th:if="${mensaje}" th:text="${mensaje}" role="status" style="color: #1b5e20;"></p>
+
+    <form th:action="@{/clientes}" th:object="${cliente}" method="post" style="display: grid; gap: 1rem;">
+        <div>
+            <label for="identificacion">Identificación</label>
+            <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45" autocomplete="off">
+            <small th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}" style="color: #b00020;"></small>
+        </div>
+        <div>
+            <label for="nombre">Nombre completo</label>
+            <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45" autocomplete="name">
+            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: #b00020;"></small>
+        </div>
+        <div>
+            <label for="telefono">Teléfono de contacto</label>
+            <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45" autocomplete="tel">
+            <small th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color: #b00020;"></small>
+        </div>
+        <div>
+            <label for="correo">Correo electrónico (opcional)</label>
+            <input id="correo" type="email" th:field="*{correo}" maxlength="254" autocomplete="email">
+            <small th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color: #b00020;"></small>
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" th:field="*{consentimientoComprobantes}">
+                Autorizo el envío de mis comprobantes de compra al correo indicado.
+            </label>
+            <small>Esta autorización es opcional. Si no la aceptas, el registro puede continuar sin correo.</small>
+        </div>
+        <button type="submit">Registrar cliente</button>
+    </form>
+</main>
+
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
