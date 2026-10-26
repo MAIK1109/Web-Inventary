@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_usuarios_correo", columnNames = "correo")
+})
 public class UsuariosEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,7 +24,10 @@ public class UsuariosEntity implements Serializable {
     @Column(name = "nombre", length = 45)
     private String nombre;
 
-    @Column(name = "correo", length = 45)
+    @Column(name = "telefono", length = 45)
+    private String telefono;
+
+    @Column(name = "correo", length = 254, nullable = false)
     private String correo;
 
     @Column(name = "rol", length = 45)
@@ -124,6 +129,14 @@ public class UsuariosEntity implements Serializable {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     public String getRol() {
