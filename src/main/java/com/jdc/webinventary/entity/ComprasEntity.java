@@ -27,16 +27,16 @@ public class ComprasEntity implements Serializable {
     // Relación Muchos a Uno con Proveedores (proveedor_idproveedor)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proveedor_idproveedor", nullable = false)
-    private ProveedorEntity proveedor;
+    private ProveedoresEntity proveedor;
 
     // Relación Uno a Muchos con DetalleCompra (compra_idcompra)
     @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleComprasEntity> detalles = new ArrayList<>();
 
-    public CompraEntity() {
+    public ComprasEntity() {
     }
 
-    public CompraEntity(Integer idCompra, LocalDate fecha, Byte estado, ProveedorEntity proveedor) {
+    public ComprasEntity(Integer idCompra, LocalDate fecha, Byte estado, ProveedoresEntity proveedor) {
         this.idCompra = idCompra;
         this.fecha = fecha;
         this.estado = estado;
@@ -67,11 +67,11 @@ public class ComprasEntity implements Serializable {
         this.estado = estado;
     }
 
-    public ProveedorEntity getProveedor() {
+    public ProveedoresEntity getProveedor() {
         return proveedor;
     }
 
-    public void setProveedor(ProveedorEntity proveedor) {
+    public void setProveedor(ProveedoresEntity proveedor) {
         this.proveedor = proveedor;
     }
 

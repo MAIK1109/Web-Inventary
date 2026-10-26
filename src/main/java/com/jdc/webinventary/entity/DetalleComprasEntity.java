@@ -23,7 +23,7 @@ public class DetalleComprasEntity implements Serializable {
     // Relación Mucho a Uno con CompraEntity (compra_idcompra)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compra_idcompra", nullable = false)
-    private CompraEntity compra;
+    private ComprasEntity compra;
 
     // Si ya tienes la entidad ProductoEntity creada, desmarca estas líneas:
     /*
@@ -59,11 +59,11 @@ public class DetalleComprasEntity implements Serializable {
         this.costoUnitario = costoUnitario;
     }
 
-    public CompraEntity getCompra() {
+    public ComprasEntity getCompra() {
         return compra;
     }
 
-    public void setCompra(CompraEntity compra) {
+    public void setCompra(ComprasEntity compra) {
         this.compra = compra;
     }
 }
