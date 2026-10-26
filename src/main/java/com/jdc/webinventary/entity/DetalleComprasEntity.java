@@ -25,12 +25,10 @@ public class DetalleComprasEntity implements Serializable {
     @JoinColumn(name = "compra_idcompra", nullable = false)
     private ComprasEntity compra;
 
-    // Si ya tienes la entidad ProductoEntity creada, desmarca estas líneas:
-    /*
+    // Relación N:1 con ProductosEntity (producto_idproducto)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_idproducto", nullable = false)
-    private ProductoEntity producto;
-    */
+    private ProductosEntity producto;
 
     public DetalleComprasEntity() {
     }
@@ -65,5 +63,13 @@ public class DetalleComprasEntity implements Serializable {
 
     public void setCompra(ComprasEntity compra) {
         this.compra = compra;
+    }
+
+    public ProductosEntity getProducto() {
+        return producto;
+    }
+
+    public void setProducto(ProductosEntity producto) {
+        this.producto = producto;
     }
 }
