@@ -3,22 +3,32 @@
 <head th:replace="~{Layout/layout :: head('Iniciar sesión')}"></head>
 <body>
 <nav th:replace="~{Layout/layout :: navbar}"></nav>
-<main style="max-width: 440px; margin: 2rem auto; padding: 1.5rem;">
-    <h1>Iniciar sesión</h1>
-    <p th:if="${param.error}" role="alert" style="color: #b00020;">Correo o contraseña incorrectos, o la cuenta está pendiente de activación o bloqueada.</p>
-    <p th:if="${param.logout}">La sesión se cerró correctamente.</p>
-    <p th:if="${param.correoActualizado}">Actualizaste tu correo. Inicia sesión con el nuevo correo.</p>
-    <form th:action="@{/login}" method="post" style="display: grid; gap: 1rem;">
-        <div>
-            <label for="username">Correo</label>
-            <input id="username" name="username" type="email" required autocomplete="username">
-        </div>
-        <div>
-            <label for="password">Contraseña</label>
-            <input id="password" name="password" type="password" required autocomplete="current-password">
-        </div>
-        <button type="submit">Ingresar</button>
-    </form>
+<main class="auth-wrap">
+    <section class="auth-copy">
+        <div><p class="eyebrow">Qué bueno verte</p><h1>Retoma el control de tu operación.</h1>
+            <p>Inicia sesión para continuar con tu trabajo en Web Inventary.</p></div>
+        <p>Accede con el correo y la contraseña de tu cuenta.</p>
+    </section>
+    <section class="auth-card">
+        <p class="eyebrow">Acceso seguro</p>
+        <h2>Iniciar sesión</h2>
+        <p>Ingresa tus credenciales para continuar.</p>
+        <div th:if="${param.error}" class="alert alert-error" role="alert">Correo o contraseña incorrectos, o la cuenta está pendiente de activación o bloqueada.</div>
+        <div th:if="${param.logout}" class="alert alert-success" role="status">La sesión se cerró correctamente.</div>
+        <div th:if="${param.correoActualizado}" class="alert alert-info" role="status">Actualizaste tu correo. Inicia sesión con el nuevo correo.</div>
+        <form th:action="@{/login}" method="post">
+            <div class="field">
+                <label for="username">Correo electrónico</label>
+                <input id="username" name="username" type="email" required autocomplete="username" placeholder="nombre@correo.com">
+            </div>
+            <div class="field">
+                <label for="password">Contraseña</label>
+                <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Tu contraseña">
+            </div>
+            <div class="form-actions"><button class="button button-primary" type="submit">Ingresar <span aria-hidden="true">→</span></button></div>
+        </form>
+        <p class="form-footnote">¿Aún no tienes cuenta? <a th:href="@{/registro}">Regístrate</a></p>
+    </section>
 </main>
 <footer th:replace="~{Layout/layout :: footer}"></footer>
 </body>
