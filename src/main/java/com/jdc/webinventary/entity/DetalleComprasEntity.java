@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "detalles_compras")
-public class DetalleCompraEntity implements Serializable {
+public class DetalleComprasEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +32,7 @@ public class DetalleCompraEntity implements Serializable {
     private ProductoEntity producto;
     */
 
-    public DetalleCompraEntity() {
+    public DetalleComprasEntity() {
     }
 
     public Integer getIdDetalleCompra() {

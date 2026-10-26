@@ -31,7 +31,7 @@ public class ComprasEntity implements Serializable {
 
     // Relación Uno a Muchos con DetalleCompra (compra_idcompra)
     @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetalleCompraEntity> detalles = new ArrayList<>();
+    private List<DetalleComprasEntity> detalles = new ArrayList<>();
 
     public CompraEntity() {
     }
@@ -75,11 +75,11 @@ public class ComprasEntity implements Serializable {
         this.proveedor = proveedor;
     }
 
-    public List<DetalleCompraEntity> getDetalles() {
+    public List<DetalleComprasEntity> getDetalles() {
         return detalles;
     }
 
-    public void setDetalles(List<DetalleCompraEntity> detalles) {
+    public void setDetalles(List<DetalleComprasEntity> detalles) {
         this.detalles = detalles;
     }
 }
