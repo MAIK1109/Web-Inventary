@@ -5,7 +5,6 @@ import com.jdc.webinventary.entity.UsuariosEntity;
 import com.jdc.webinventary.repository.UsuariosRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
@@ -14,10 +13,11 @@ import java.util.Locale;
 public class RegistroCuentaService {
 
     private final UsuariosRepository usuariosRepository;
-    private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+    private final PasswordEncoder passwordEncoder;
 
-    public RegistroCuentaService(UsuariosRepository usuariosRepository) {
+    public RegistroCuentaService(UsuariosRepository usuariosRepository, PasswordEncoder passwordEncoder) {
         this.usuariosRepository = usuariosRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public boolean correoYaRegistrado(String correo) {
@@ -34,6 +34,7 @@ public class RegistroCuentaService {
         usuario.setHashPassword(passwordEncoder.encode(form.getPassword()));
         usuario.setRol("USUARIO");
         usuario.setVerificado("NO");
+        usuario.setEstadoCuenta("PENDIENTE");
 
         try {
             usuariosRepository.saveAndFlush(usuario);

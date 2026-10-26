@@ -36,6 +36,9 @@ public class UsuariosEntity implements Serializable {
     @Column(name = "verificado", length = 45)
     private String verificado;
 
+    @Column(name = "estado_cuenta", length = 20)
+    private String estadoCuenta;
+
     @Column(name = "hash_password", length = 120)
     private String hashPassword;
 
@@ -153,6 +156,14 @@ public class UsuariosEntity implements Serializable {
 
     public void setVerificado(String verificado) {
         this.verificado = verificado;
+    }
+
+    public String getEstadoCuenta() {
+        return estadoCuenta;
+    }
+
+    public void setEstadoCuenta(String estadoCuenta) {
+        this.estadoCuenta = estadoCuenta;
     }
 
     public String getHashPassword() {
