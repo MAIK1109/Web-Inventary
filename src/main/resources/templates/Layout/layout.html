@@ -23,6 +23,14 @@
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link active" aria-current="page" th:href="@{/}">Inicio</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/registro}">Crear cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/login}">Iniciar sesión</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/cuenta}">Mi cuenta</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/admin/usuarios}">Administrar usuarios</a></li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button class="nav-link" type="submit">Cerrar sesión</button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </dialog>

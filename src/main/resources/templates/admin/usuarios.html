@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Administrar usuarios')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main style="max-width: 1100px; margin: 2rem auto; padding: 1.5rem;">
+    <h1>Administración de usuarios</h1>
+    <p th:if="${mensaje}" th:text="${mensaje}" role="status" style="color: #1b5e20;"></p>
+    <p th:if="${error}" th:text="${error}" role="alert" style="color: #b00020;"></p>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+            <tr><th>Identificación</th><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.identificacion}"></td>
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.telefono}"></td>
+                <td th:text="${usuario.correo}"></td>
+                <td th:text="${usuario.rol}"></td>
+                <td th:text="${usuario.estadoCuenta == null ? 'ACTIVA (cuenta anterior)' : usuario.estadoCuenta}"></td>
+                <td style="white-space: nowrap;">
+                    <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.idUsuario})}">Editar</a>
+                    <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta != null and usuario.estadoCuenta != 'ACTIVA'}"
+                          th:action="@{/admin/usuarios/{id}/activar(id=${usuario.idUsuario})}" method="post" style="display: inline;">
+                        <button type="submit">Activar</button>
+                    </form>
+                    <form th:if="${usuario.rol != 'SUPERADMIN' and (usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA')}"
+                          th:action="@{/admin/usuarios/{id}/bloquear(id=${usuario.idUsuario})}" method="post" style="display: inline;">
+                        <button type="submit">Bloquear</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(usuarios)}"><td colspan="7">No hay cuentas registradas.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
