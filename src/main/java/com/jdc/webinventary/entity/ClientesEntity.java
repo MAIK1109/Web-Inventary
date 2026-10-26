@@ -2,11 +2,14 @@ package com.jdc.webinventary.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "clientes")
+@Table(name = "clientes", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_clientes_identificacion", columnNames = "identificacion")
+})
 public class ClientesEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,11 +28,17 @@ public class ClientesEntity implements Serializable {
     @Column(name = "telefono", length = 45)
     private String telefono;
 
-    @Column(name = "correo", length = 45)
+    @Column(name = "correo", length = 254)
     private String correo;
 
     @Column(name = "direccion", length = 45)
     private String direccion;
+
+    @Column(name = "consentimiento_comprobantes")
+    private Boolean consentimientoComprobantes;
+
+    @Column(name = "fecha_consentimiento_comprobantes")
+    private LocalDateTime fechaConsentimientoComprobantes;
 
     // Relación Uno a Muchos con Ventas
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -84,6 +93,22 @@ public class ClientesEntity implements Serializable {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public Boolean getConsentimientoComprobantes() {
+        return consentimientoComprobantes;
+    }
+
+    public void setConsentimientoComprobantes(boolean consentimientoComprobantes) {
+        this.consentimientoComprobantes = consentimientoComprobantes;
+    }
+
+    public LocalDateTime getFechaConsentimientoComprobantes() {
+        return fechaConsentimientoComprobantes;
+    }
+
+    public void setFechaConsentimientoComprobantes(LocalDateTime fechaConsentimientoComprobantes) {
+        this.fechaConsentimientoComprobantes = fechaConsentimientoComprobantes;
     }
 
     public List<VentasEntity> getVentas() {
