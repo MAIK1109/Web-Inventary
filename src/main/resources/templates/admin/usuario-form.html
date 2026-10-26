@@ -3,43 +3,57 @@
 <head th:replace="~{Layout/layout :: head('Editar cuenta')}"></head>
 <body>
 <nav th:replace="~{Layout/layout :: navbar}"></nav>
-<main style="max-width: 560px; margin: 2rem auto; padding: 1.5rem;">
-    <h1>Administrar cuenta</h1>
-    <p>Estado actual: <strong th:text="${usuario.estadoCuenta == null ? 'ACTIVA (cuenta anterior)' : usuario.estadoCuenta}"></strong></p>
-    <p th:if="${usuario.rol == 'SUPERADMIN'}">La cuenta del superadministrador no se puede bloquear ni cambiar de rol.</p>
-    <form th:action="@{/admin/usuarios/{id}(id=${usuarioId})}" th:object="${cuenta}" method="post" style="display: grid; gap: 1rem;">
-        <div>
-            <label for="identificacion">Identificación</label>
-            <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45">
-            <small th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}" style="color: #b00020;"></small>
-        </div>
-        <div>
-            <label for="nombre">Nombre</label>
-            <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45">
-            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: #b00020;"></small>
-        </div>
-        <div>
-            <label for="telefono">Teléfono</label>
-            <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45">
-            <small th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" style="color: #b00020;"></small>
-        </div>
-        <div>
-            <label for="correo">Correo</label>
-            <input id="correo" type="email" th:field="*{correo}" required maxlength="254">
-            <small th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" style="color: #b00020;"></small>
-        </div>
-        <div>
-            <label for="rol">Rol</label>
-            <select id="rol" th:field="*{rol}">
-                <option value="USUARIO">Usuario</option>
-                <option value="ADMINISTRADOR">Administrador</option>
-                <option th:if="${usuario.rol == 'SUPERADMIN'}" value="SUPERADMIN">Superadministrador</option>
-            </select>
-            <small th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}" style="color: #b00020;"></small>
-        </div>
-        <button type="submit">Guardar cambios</button>
-    </form>
-    <p><a th:href="@{/admin/usuarios}">Volver a usuarios</a></p>
+<main class="page-wrap page-wrap-narrow">
+    <header class="page-heading">
+        <p class="eyebrow">Administración de cuentas</p>
+        <h1>Editar usuario</h1>
+        <p>Actualiza los datos de contacto y el rol asignado a esta cuenta.</p>
+    </header>
+    <div class="account-summary">
+        <span class="avatar" aria-hidden="true">◎</span>
+        <div><strong th:text="${usuario.nombre}"></strong><span th:text="${usuario.estadoCuenta == null ? 'Cuenta anterior · activa' : usuario.estadoCuenta}"></span></div>
+    </div>
+    <div th:if="${usuario.rol == 'SUPERADMIN'}" class="alert alert-info" role="note">La cuenta principal del superadministrador no se puede bloquear ni cambiar de rol.</div>
+    <section class="form-card">
+        <form th:action="@{/admin/usuarios/{id}(id=${usuarioId})}" th:object="${cuenta}" method="post">
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="identificacion">Identificación</label>
+                    <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45">
+                    <small class="field-error" th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}"></small>
+                </div>
+                <div class="field field-full">
+                    <label for="nombre">Nombre completo</label>
+                    <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45">
+                    <small class="field-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+                <div class="field">
+                    <label for="telefono">Teléfono</label>
+                    <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45">
+                    <small class="field-error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></small>
+                </div>
+                <div class="field">
+                    <label for="correo">Correo electrónico</label>
+                    <input id="correo" type="email" th:field="*{correo}" required maxlength="254">
+                    <small class="field-error" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></small>
+                </div>
+                <div class="field field-full">
+                    <label for="rol">Rol de acceso</label>
+                    <select id="rol" th:field="*{rol}">
+                        <option value="USUARIO">Usuario</option>
+                        <option value="ADMINISTRADOR">Administrador</option>
+                        <option th:if="${usuario.rol == 'SUPERADMIN'}" value="SUPERADMIN">Superadministrador</option>
+                    </select>
+                    <small class="field-hint">Solo el superadministrador puede asignar roles.</small>
+                    <small class="field-error" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">Guardar cambios <span aria-hidden="true">→</span></button>
+                <a class="button button-secondary" th:href="@{/admin/usuarios}">Cancelar</a>
+            </div>
+        </form>
+    </section>
 </main>
 <footer th:replace="~{Layout/layout :: footer}"></footer>
 </body>

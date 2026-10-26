@@ -3,39 +3,50 @@
 <head th:replace="~{Layout/layout :: head('Administrar usuarios')}"></head>
 <body>
 <nav th:replace="~{Layout/layout :: navbar}"></nav>
-<main style="max-width: 1100px; margin: 2rem auto; padding: 1.5rem;">
-    <h1>Administración de usuarios</h1>
-    <p th:if="${mensaje}" th:text="${mensaje}" role="status" style="color: #1b5e20;"></p>
-    <p th:if="${error}" th:text="${error}" role="alert" style="color: #b00020;"></p>
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-            <tr><th>Identificación</th><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
-            </thead>
-            <tbody>
-            <tr th:each="usuario : ${usuarios}">
-                <td th:text="${usuario.identificacion}"></td>
-                <td th:text="${usuario.nombre}"></td>
-                <td th:text="${usuario.telefono}"></td>
-                <td th:text="${usuario.correo}"></td>
-                <td th:text="${usuario.rol}"></td>
-                <td th:text="${usuario.estadoCuenta == null ? 'ACTIVA (cuenta anterior)' : usuario.estadoCuenta}"></td>
-                <td style="white-space: nowrap;">
-                    <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.idUsuario})}">Editar</a>
-                    <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta != null and usuario.estadoCuenta != 'ACTIVA'}"
-                          th:action="@{/admin/usuarios/{id}/activar(id=${usuario.idUsuario})}" method="post" style="display: inline;">
-                        <button type="submit">Activar</button>
-                    </form>
-                    <form th:if="${usuario.rol != 'SUPERADMIN' and (usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA')}"
-                          th:action="@{/admin/usuarios/{id}/bloquear(id=${usuario.idUsuario})}" method="post" style="display: inline;">
-                        <button type="submit">Bloquear</button>
-                    </form>
-                </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(usuarios)}"><td colspan="7">No hay cuentas registradas.</td></tr>
-            </tbody>
-        </table>
-    </div>
+<main class="page-wrap">
+    <header class="page-heading">
+        <p class="eyebrow">Panel de control</p>
+        <h1>Administrar usuarios</h1>
+        <p>Consulta las cuentas, revisa su estado y controla el acceso al sistema.</p>
+    </header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
+    <section class="table-card">
+        <div class="table-top">
+            <div><h2>Cuentas registradas</h2><p>Activa las cuentas pendientes o bloquea el acceso cuando sea necesario.</p></div>
+            <span class="status-pill" th:text="|${#lists.size(usuarios)} cuentas|">0 cuentas</span>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Cuenta</th><th>Contacto</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                <tr th:each="usuario : ${usuarios}">
+                    <td><strong th:text="${usuario.nombre}"></strong><small class="table-subtext" th:text="${usuario.identificacion}"></small></td>
+                    <td><span th:text="${usuario.correo}"></span><small class="table-subtext" th:text="${usuario.telefono}"></small></td>
+                    <td><span class="role-pill" th:text="${usuario.rol}"></span></td>
+                    <td>
+                        <span class="status-pill" th:classappend="${usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA' ? 'status-active' : (usuario.estadoCuenta == 'BLOQUEADA' ? 'status-blocked' : 'status-pending')}"
+                              th:text="${usuario.estadoCuenta == null ? 'ACTIVA' : usuario.estadoCuenta}"></span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="button button-secondary button-small" th:href="@{/admin/usuarios/{id}/editar(id=${usuario.idUsuario})}">Editar</a>
+                            <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta != null and usuario.estadoCuenta != 'ACTIVA'}"
+                                  th:action="@{/admin/usuarios/{id}/activar(id=${usuario.idUsuario})}" method="post">
+                                <button class="button button-primary button-small" type="submit">Activar</button>
+                            </form>
+                            <form th:if="${usuario.rol != 'SUPERADMIN' and (usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA')}"
+                                  th:action="@{/admin/usuarios/{id}/bloquear(id=${usuario.idUsuario})}" method="post">
+                                <button class="button button-danger button-small" type="submit">Bloquear</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(usuarios)}"><td class="empty-state" colspan="5"><span class="empty-icon" aria-hidden="true">◎</span>No hay cuentas registradas todavía.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>
 <footer th:replace="~{Layout/layout :: footer}"></footer>
 </body>
