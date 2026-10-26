@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "compras")
-public class CompraEntity implements Serializable {
+public class ComprasEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
