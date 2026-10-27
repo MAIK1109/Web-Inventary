@@ -18,3 +18,7 @@ En la pantalla de inicio de sesión, selecciona **¿Olvidaste tu contraseña?**.
 ## Registro de aportes
 
 Los usuarios con sesión activa pueden enviar aportes desde `/aportes/mi-cuenta`. El soporte es opcional; se aceptan PDF, PNG y JPG de hasta 5 MB y se guardan en `uploads/aportes` (configurable con `APORTES_UPLOAD_DIR`). Cada aporte queda pendiente hasta que lo revise el superadministrador.
+
+## Dashboard financiero
+
+El dashboard está disponible para cuentas con rol de administrador o superadministrador en `/dashboard/financiero`. Permite registrar gastos y consultar ventas confirmadas, costo de mercancía, utilidad estimada, margen neto y evolución mensual. Para ventas antiguas sin costo histórico, se usa el costo de la compra confirmada más reciente anterior a la venta; si no existe un costo de referencia, esa línea se señala en el dashboard.
