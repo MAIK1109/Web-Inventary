@@ -16,6 +16,7 @@
         <div th:if="${param.error}" class="alert alert-error" role="alert">Correo o contraseña incorrectos, o la cuenta está pendiente de activación o bloqueada.</div>
         <div th:if="${param.logout}" class="alert alert-success" role="status">La sesión se cerró correctamente.</div>
         <div th:if="${param.correoActualizado}" class="alert alert-info" role="status">Actualizaste tu correo. Inicia sesión con el nuevo correo.</div>
+        <div th:if="${passwordActualizada}" class="alert alert-success" role="status">La contraseña se actualizó. Ya puedes iniciar sesión.</div>
         <form th:action="@{/login}" method="post">
             <div class="field">
                 <label for="username">Correo electrónico</label>
@@ -27,6 +28,7 @@
             </div>
             <div class="form-actions"><button class="button button-primary" type="submit">Ingresar <span aria-hidden="true">→</span></button></div>
         </form>
+        <p class="form-footnote"><a th:href="@{/recuperar-acceso}">¿Olvidaste tu contraseña?</a></p>
         <p class="form-footnote">¿Aún no tienes cuenta? <a th:href="@{/registro}">Regístrate</a></p>
     </section>
 </main>
