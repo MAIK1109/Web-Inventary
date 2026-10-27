@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Registrar venta')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Punto de venta</p><h1>Ventas</h1>
+        <p>Registra cliente, productos y medio de pago. El vendedor se toma de tu sesión.</p></header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+    <section class="form-card">
+        <h2>Registrar y confirmar venta</h2>
+        <form th:action="@{/ventas}" th:object="${venta}" method="post">
+            <div class="form-grid">
+                <div class="field"><label for="clienteId">Cliente</label>
+                    <select id="clienteId" th:field="*{clienteId}" required>
+                        <option value="">Selecciona cliente</option>
+                        <option th:each="cliente : ${clientes}" th:value="${cliente.idCliente}" th:text="|${cliente.nombre} — ${cliente.identificacion}|"></option>
+                    </select><small class="field-error" th:errors="*{clienteId}"></small></div>
+                <div class="field"><label for="medioPago">Medio de pago</label>
+                    <select id="medioPago" th:field="*{medioPago}" required>
+                        <option value="">Selecciona medio de pago</option><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Otro</option>
+                    </select><small class="field-error" th:errors="*{medioPago}"></small></div>
+            </div>
+            <h3>Productos</h3>
+            <div id="detalles-venta">
+                <div class="form-grid sale-line" th:each="detalle, stat : *{detalles}">
+                    <div class="field"><label>Producto</label><select class="producto-select" th:field="*{detalles[__${stat.index}__].productoId}" required>
+                        <option value="">Selecciona producto</option>
+                        <option th:each="producto : ${productos}" th:value="${producto.idProducto}"
+                                th:attr="data-price=${producto.precioVenta}"
+                                th:text="|${producto.codigo} — ${producto.nombre} · stock ${producto.stockActual} · precio ${producto.precioVenta}|"></option>
+                    </select><small class="field-error" th:errors="*{detalles[__${stat.index}__].productoId}"></small></div>
+                    <div class="field"><label>Cantidad</label><input class="cantidad-input" type="number" min="1" step="1" th:field="*{detalles[__${stat.index}__].cantidad}" required>
+                        <small class="field-error" th:errors="*{detalles[__${stat.index}__].cantidad}"></small></div>
+                    <div class="field"><label>Precio unitario</label><output class="precio-output">—</output></div>
+                    <button class="button button-danger button-small remove-line" type="button" th:if="${stat.index > 0}">Quitar</button>
+                </div>
+            </div>
+            <template id="detalle-template"><div class="form-grid sale-line">
+                <div class="field"><label>Producto</label><select class="producto-select" data-field="productoId" required>
+                    <option value="">Selecciona producto</option><option th:each="producto : ${productos}" th:value="${producto.idProducto}"
+                        th:attr="data-price=${producto.precioVenta}" th:text="|${producto.codigo} — ${producto.nombre} · stock ${producto.stockActual} · precio ${producto.precioVenta}|"></option>
+                </select></div>
+                <div class="field"><label>Cantidad</label><input class="cantidad-input" data-field="cantidad" type="number" min="1" step="1" required></div>
+                <div class="field"><label>Precio unitario</label><output class="precio-output">—</output></div>
+                <button class="button button-danger button-small remove-line" type="button">Quitar</button>
+            </div></template>
+            <div class="table-top" style="margin-top: 18px"><button id="agregar-detalle" class="button button-secondary" type="button">Agregar producto</button>
+                <strong>Total estimado: <output id="total-venta">0</output></strong></div>
+            <p class="field-hint">El precio y el total se calculan con los precios registrados en el catálogo.</p>
+            <div class="form-actions"><button class="button button-primary" type="submit">Confirmar venta</button></div>
+        </form>
+    </section>
+    <section class="table-card" style="margin-top: 20px">
+        <div class="table-top"><div><h2>Ventas recientes</h2><p>Las ventas confirmadas descuentan existencias y generan movimientos de salida.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Vendedor</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="item : ${ventas}"><td th:text="${item.idVenta}"></td><td th:text="${item.fecha}"></td>
+                <td th:text="${item.vendedor == null ? 'Sin asignar' : item.vendedor.nombre}"></td><td th:text="${item.cliente.nombre}"></td>
+                <td th:text="${#lists.size(item.detalles)}"></td><td th:text="${totales[item.idVenta]}"></td>
+                <td th:text="${item.estado == 1 ? 'CONFIRMADA' : item.estado}"></td></tr>
+                <tr th:if="${#lists.isEmpty(ventas)}"><td class="empty-state" colspan="7">Aún no hay ventas registradas.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<script>
+    (() => {
+        const container = document.getElementById('detalles-venta');
+        const template = document.getElementById('detalle-template');
+        const totalOutput = document.getElementById('total-venta');
+        const update = () => {
+            let total = 0;
+            container.querySelectorAll('.sale-line').forEach(row => {
+                const select = row.querySelector('.producto-select');
+                const option = select.options[select.selectedIndex];
+                const price = Number(option?.dataset.price || 0);
+                const quantity = Number(row.querySelector('.cantidad-input').value || 0);
+                row.querySelector('.precio-output').textContent = select.value ? String(price) : '—';
+                total += price * quantity;
+            });
+            totalOutput.textContent = String(total);
+        };
+        const renumber = () => container.querySelectorAll('.sale-line').forEach((row, index) => {
+            row.querySelectorAll('[data-field], select[name], input[name]').forEach(input => {
+                const field = input.dataset.field || input.name.substring(input.name.lastIndexOf('.') + 1);
+                input.name = `detalles[${index}].${field}`;
+                input.id = `detalles${index}.${field}`;
+            });
+        });
+        document.getElementById('agregar-detalle').addEventListener('click', () => {
+            const clone = template.content.cloneNode(true);
+            const index = container.querySelectorAll('.sale-line').length;
+            clone.querySelectorAll('[data-field]').forEach(input => {
+                input.name = `detalles[${index}].${input.dataset.field}`;
+                input.id = `detalles${index}.${input.dataset.field}`;
+            });
+            container.appendChild(clone);
+            update();
+        });
+        container.addEventListener('input', update);
+        container.addEventListener('change', update);
+        container.addEventListener('click', event => {
+            if (event.target.classList.contains('remove-line') && container.querySelectorAll('.sale-line').length > 1) {
+                event.target.closest('.sale-line').remove();
+                renumber();
+                update();
+            }
+        });
+        update();
+    })();
+</script>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
