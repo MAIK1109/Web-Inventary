@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "proveedores")
+@Table(name = "proveedores", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_proveedores_identificacion", columnNames = "identificacion")
+})
 public class ProveedoresEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,7 +27,7 @@ public class ProveedoresEntity implements Serializable {
     @Column(name = "telefono", length = 45)
     private String telefono;
 
-    @Column(name = "correo", length = 45)
+    @Column(name = "correo", length = 254)
     private String correo;
 
     @Column(name = "direccion", length = 45)

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Recuperar acceso')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="auth-wrap">
+    <section class="auth-copy"><div><p class="eyebrow">Acceso seguro</p><h1>Recupera tu cuenta.</h1>
+        <p>Te enviaremos un enlace temporal para crear una contraseña nueva.</p></div>
+        <p>Por seguridad, el enlace vence en 30 minutos y solo puede usarse una vez.</p></section>
+    <section class="auth-card">
+        <p class="eyebrow">Recuperación</p><h2>¿Olvidaste tu contraseña?</h2>
+        <div th:if="${solicitado}" class="alert alert-info" role="status">Si existe una cuenta activa con ese correo, recibirás un enlace para restablecer tu contraseña.</div>
+        <form th:unless="${solicitado}" th:action="@{/recuperar-acceso/solicitar}" th:object="${recuperacion}" method="post">
+            <div class="field"><label for="correo">Correo electrónico</label>
+                <input id="correo" type="email" th:field="*{correo}" required autocomplete="email" placeholder="nombre@correo.com">
+                <small class="field-error" th:errors="*{correo}"></small></div>
+            <div class="form-actions"><button class="button button-primary" type="submit">Enviar enlace</button></div>
+        </form>
+        <p class="form-footnote"><a th:href="@{/login}">Volver a iniciar sesión</a></p>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
