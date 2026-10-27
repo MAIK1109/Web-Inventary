@@ -36,7 +36,7 @@ public class RecuperacionAccesoService {
 
     public RecuperacionAccesoService(UsuariosRepository usuarios, TokenRecuperacionRepository tokens,
                                      PasswordEncoder passwordEncoder, ObjectProvider<JavaMailSender> mailSender,
-                                     @Value("${app.security.password-reset-base-url}") String baseUrl) {
+                                     @Value("${PASSWORD_RESET_BASE_URL:http://localhost:8086}") String baseUrl) {
         this.usuarios = usuarios;
         this.tokens = tokens;
         this.passwordEncoder = passwordEncoder;
