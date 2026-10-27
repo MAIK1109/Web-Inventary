@@ -3,6 +3,7 @@ package com.jdc.webinventary.repository;
 import com.jdc.webinventary.entity.ProductosEntity;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface ProductosRepository extends JpaRepository<ProductosEntity, Integer> {
+public interface ProductosRepository extends JpaRepository<ProductosEntity, Integer>, JpaSpecificationExecutor<ProductosEntity> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from ProductosEntity p where p.idProducto = :id")

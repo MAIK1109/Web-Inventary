@@ -10,4 +10,7 @@ import java.util.List;
 public interface VentasRepository extends JpaRepository<VentasEntity, Integer> {
     @EntityGraph(attributePaths = {"cliente", "vendedor", "detalles", "detalles.producto"})
     List<VentasEntity> findByFechaBetweenOrderByFechaAsc(LocalDate desde, LocalDate hasta);
+
+    @EntityGraph(attributePaths = {"cliente", "vendedor", "detalles", "detalles.producto"})
+    List<VentasEntity> findAllByOrderByFechaDesc();
 }

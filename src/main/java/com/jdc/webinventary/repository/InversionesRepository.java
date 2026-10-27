@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface InversionesRepository extends JpaRepository<InversionesEntity, Integer> {
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "usuario")
     List<InversionesEntity> findAllByOrderByFechaDesc();
     List<InversionesEntity> findByUsuario_IdUsuarioOrderByFechaDesc(Integer usuarioId);
     List<InversionesEntity> findByEstadoOrderByFechaDesc(Byte estado);
