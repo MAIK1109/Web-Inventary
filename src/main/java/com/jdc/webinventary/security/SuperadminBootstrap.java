@@ -20,8 +20,8 @@ public class SuperadminBootstrap implements ApplicationRunner {
 
     public SuperadminBootstrap(UsuariosRepository usuariosRepository,
                                PasswordEncoder passwordEncoder,
-                               @Value("${app.superadmin.email:}") String correo,
-                               @Value("${app.superadmin.password:}") String password) {
+                               @Value("${SUPERADMIN_EMAIL:}") String correo,
+                               @Value("${SUPERADMIN_PASSWORD:}") String password) {
         this.usuariosRepository = usuariosRepository;
         this.passwordEncoder = passwordEncoder;
         this.correo = correo == null ? "" : correo.trim().toLowerCase(Locale.ROOT);
@@ -39,9 +39,12 @@ public class SuperadminBootstrap implements ApplicationRunner {
 
         var existing = usuariosRepository.findByCorreoIgnoreCase(correo);
         if (existing.isPresent()) {
-            if (!"SUPERADMIN".equals(existing.get().getRol())) {
-                throw new IllegalStateException("El correo SUPERADMIN_EMAIL ya pertenece a una cuenta existente; usa otro correo para el superadministrador inicial");
-            }
+            UsuariosEntity superadmin = existing.get();
+            superadmin.setHashPassword(passwordEncoder.encode(password));
+            superadmin.setRol("SUPERADMIN");
+            superadmin.setVerificado("SI");
+            superadmin.setEstadoCuenta("ACTIVA");
+            usuariosRepository.save(superadmin);
             return;
         }
 
