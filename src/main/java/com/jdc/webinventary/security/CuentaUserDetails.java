@@ -14,6 +14,7 @@ public class CuentaUserDetails implements UserDetails {
     private final String correo;
     private final String hashPassword;
     private final String estadoCuenta;
+    private final String verificado;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public CuentaUserDetails(UsuariosEntity usuario) {
@@ -21,6 +22,7 @@ public class CuentaUserDetails implements UserDetails {
         this.correo = usuario.getCorreo();
         this.hashPassword = usuario.getHashPassword();
         this.estadoCuenta = usuario.getEstadoCuenta();
+        this.verificado = usuario.getVerificado();
 
         String rol = usuario.getRol();
         if (rol == null || !List.of("SUPERADMIN", "ADMINISTRADOR", "USUARIO").contains(rol)) {
@@ -65,6 +67,6 @@ public class CuentaUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return estadoCuenta == null || "ACTIVA".equals(estadoCuenta);
+        return "ACTIVA".equals(estadoCuenta) && "SI".equals(verificado);
     }
 }

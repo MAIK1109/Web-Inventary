@@ -32,7 +32,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/registro", "/login", "/recuperar-acceso/**", "/error", "/images/**", "/css/**").permitAll()
+                        .requestMatchers("/", "/registro", "/login", "/verificar-correo", "/recuperar-acceso/**", "/error", "/images/**", "/css/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("SUPERADMIN")
                         .requestMatchers("/cuenta/**").authenticated()
                         .anyRequest().authenticated()

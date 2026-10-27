@@ -20,10 +20,13 @@ public class AdministracionUsuariosService {
 
     private final UsuariosRepository usuariosRepository;
     private final SessionRegistry sessionRegistry;
+    private final VerificacionCorreoService verificacionCorreo;
 
-    public AdministracionUsuariosService(UsuariosRepository usuariosRepository, SessionRegistry sessionRegistry) {
+    public AdministracionUsuariosService(UsuariosRepository usuariosRepository, SessionRegistry sessionRegistry,
+                                         VerificacionCorreoService verificacionCorreo) {
         this.usuariosRepository = usuariosRepository;
         this.sessionRegistry = sessionRegistry;
+        this.verificacionCorreo = verificacionCorreo;
     }
 
     public List<UsuariosEntity> listarUsuarios() {
@@ -40,15 +43,21 @@ public class AdministracionUsuariosService {
         UsuariosEntity usuario = obtenerUsuario(idUsuario);
         String correo = normalizarCorreo(form.getCorreo());
         validarCorreoDisponible(correo, idUsuario);
+        boolean cambiaCorreo = !correo.equalsIgnoreCase(usuario.getCorreo());
 
         usuario.setIdentificacion(form.getIdentificacion().trim());
         usuario.setNombre(form.getNombre().trim());
         usuario.setTelefono(form.getTelefono().trim());
         usuario.setCorreo(correo);
+        if (cambiaCorreo) usuario.setVerificado("NO");
         try {
             usuariosRepository.saveAndFlush(usuario);
         } catch (DataIntegrityViolationException ex) {
             throw new CorreoDuplicadoException();
+        }
+        if (cambiaCorreo) {
+            expirarSesiones(idUsuario);
+            verificacionCorreo.enviarEnlace(usuario);
         }
     }
 
@@ -71,6 +80,7 @@ public class AdministracionUsuariosService {
         usuario.setTelefono(form.getTelefono().trim());
         usuario.setCorreo(correo);
         usuario.setRol(form.getRol());
+        if (cambiaCorreo) usuario.setVerificado("NO");
         try {
             usuariosRepository.saveAndFlush(usuario);
         } catch (DataIntegrityViolationException ex) {
@@ -80,6 +90,7 @@ public class AdministracionUsuariosService {
         if (cambiaRol || cambiaCorreo) {
             expirarSesiones(idUsuario);
         }
+        if (cambiaCorreo) verificacionCorreo.enviarEnlace(usuario);
     }
 
     @Transactional
@@ -87,7 +98,6 @@ public class AdministracionUsuariosService {
         UsuariosEntity usuario = obtenerUsuario(idUsuario);
         protegerSuperadmin(usuario);
         usuario.setEstadoCuenta("ACTIVA");
-        usuario.setVerificado("SI");
         usuariosRepository.saveAndFlush(usuario);
         expirarSesiones(idUsuario);
     }

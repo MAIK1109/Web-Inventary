@@ -78,7 +78,7 @@ public class AdministracionUsuariosController {
     public String activar(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
         try {
             administracion.activar(id);
-            redirectAttributes.addFlashAttribute("mensaje", "La cuenta quedó activa.");
+            redirectAttributes.addFlashAttribute("mensaje", "La cuenta quedó activa; el usuario también debe verificar su correo para iniciar sesión.");
         } catch (AdministracionUsuariosService.OperacionNoPermitidaException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
         }
