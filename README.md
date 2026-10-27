@@ -5,7 +5,7 @@ Sistema web integral de gestión de inventarios, compras, ventas e inversiones d
 
 El superadministrador inicial se crea al arrancar la aplicación cuando se configuran las variables de entorno `SUPERADMIN_EMAIL` y `SUPERADMIN_PASSWORD`. La contraseña debe tener al menos 12 caracteres y no debe guardarse en el repositorio. El correo debe ser nuevo en la tabla `usuarios`; el proceso no eleva automáticamente una cuenta existente a superadministrador.
 
-En IntelliJ, configura ambas variables en **Run/Debug Configurations → Environment variables** y reinicia la aplicación. Luego inicia sesión en `/login` y administra las cuentas en `/admin/usuarios`. Las cuentas registradas públicamente quedan pendientes hasta que un superadministrador las active.
+En IntelliJ, configura ambas variables en **Run/Debug Configurations → Environment variables** y reinicia la aplicación. Luego inicia sesión en `/login` y administra las cuentas en `/admin/usuarios`. Las cuentas registradas públicamente reciben un enlace de verificación válido por 24 horas y quedan pendientes hasta que un superadministrador las active. Configura también `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH` y `MAIL_SMTP_STARTTLS` para enviar los enlaces, y `EMAIL_VERIFICATION_BASE_URL` con la dirección pública de la aplicación. El inicio de sesión requiere tanto el correo verificado como la cuenta activa.
 
 ## Registro de clientes
 

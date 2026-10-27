@@ -13,9 +13,11 @@
         <p class="eyebrow">Acceso seguro</p>
         <h2>Iniciar sesión</h2>
         <p>Ingresa tus credenciales para continuar.</p>
-        <div th:if="${param.error}" class="alert alert-error" role="alert">Correo o contraseña incorrectos, o la cuenta está pendiente de activación o bloqueada.</div>
+        <div th:if="${param.error}" class="alert alert-error" role="alert">Correo o contraseña incorrectos, la cuenta está pendiente de activación, el correo no se ha verificado o la cuenta está bloqueada.</div>
         <div th:if="${param.logout}" class="alert alert-success" role="status">La sesión se cerró correctamente.</div>
-        <div th:if="${param.correoActualizado}" class="alert alert-info" role="status">Actualizaste tu correo. Inicia sesión con el nuevo correo.</div>
+        <div th:if="${correoVerificado}" class="alert alert-success" role="status">Correo verificado. Para iniciar sesión, tu cuenta también debe estar activa.</div>
+        <div th:if="${verificacionInvalida}" class="alert alert-error" role="alert">El enlace de verificación venció, ya fue usado o no es válido.</div>
+        <div th:if="${param.correoActualizado}" class="alert alert-info" role="status">Actualizaste tu correo. Confirma el enlace enviado a la nueva dirección antes de iniciar sesión.</div>
         <div th:if="${passwordActualizada}" class="alert alert-success" role="status">La contraseña se actualizó. Ya puedes iniciar sesión.</div>
         <form th:action="@{/login}" method="post">
             <div class="field">

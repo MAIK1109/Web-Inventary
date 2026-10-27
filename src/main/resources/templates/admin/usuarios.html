@@ -13,7 +13,7 @@
     <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
     <section class="table-card">
         <div class="table-top">
-            <div><h2>Cuentas registradas</h2><p>Activa las cuentas pendientes o bloquea el acceso cuando sea necesario.</p></div>
+            <div><h2>Cuentas registradas</h2><p>El acceso requiere que la cuenta esté activa y que el correo esté verificado.</p></div>
             <span class="status-pill" th:text="|${#lists.size(usuarios)} cuentas|">0 cuentas</span>
         </div>
         <div class="table-wrap">
@@ -22,20 +22,20 @@
                 <tbody>
                 <tr th:each="usuario : ${usuarios}">
                     <td><strong th:text="${usuario.nombre}"></strong><small class="table-subtext" th:text="${usuario.identificacion}"></small></td>
-                    <td><span th:text="${usuario.correo}"></span><small class="table-subtext" th:text="${usuario.telefono}"></small></td>
+                    <td><span th:text="${usuario.correo}"></span><small class="table-subtext" th:text="${usuario.verificado == 'SI' ? 'Correo verificado' : 'Correo sin verificar'}"></small><small class="table-subtext" th:text="${usuario.telefono}"></small></td>
                     <td><span class="role-pill" th:text="${usuario.rol}"></span></td>
                     <td>
-                        <span class="status-pill" th:classappend="${usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA' ? 'status-active' : (usuario.estadoCuenta == 'BLOQUEADA' ? 'status-blocked' : 'status-pending')}"
-                              th:text="${usuario.estadoCuenta == null ? 'ACTIVA' : usuario.estadoCuenta}"></span>
+                        <span class="status-pill" th:classappend="${usuario.estadoCuenta == 'ACTIVA' ? 'status-active' : (usuario.estadoCuenta == 'BLOQUEADA' ? 'status-blocked' : 'status-pending')}"
+                              th:text="${usuario.estadoCuenta == null ? 'PENDIENTE' : usuario.estadoCuenta}"></span>
                     </td>
                     <td>
                         <div class="table-actions">
                             <a class="button button-secondary button-small" th:href="@{/admin/usuarios/{id}/editar(id=${usuario.idUsuario})}">Editar</a>
-                            <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta != null and usuario.estadoCuenta != 'ACTIVA'}"
+                            <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta != 'ACTIVA'}"
                                   th:action="@{/admin/usuarios/{id}/activar(id=${usuario.idUsuario})}" method="post">
                                 <button class="button button-primary button-small" type="submit">Activar</button>
                             </form>
-                            <form th:if="${usuario.rol != 'SUPERADMIN' and (usuario.estadoCuenta == null or usuario.estadoCuenta == 'ACTIVA')}"
+                            <form th:if="${usuario.rol != 'SUPERADMIN' and usuario.estadoCuenta == 'ACTIVA'}"
                                   th:action="@{/admin/usuarios/{id}/bloquear(id=${usuario.idUsuario})}" method="post">
                                 <button class="button button-danger button-small" type="submit">Bloquear</button>
                             </form>

@@ -15,7 +15,7 @@
         <h2>Crear cuenta</h2>
         <p>Completa tus datos para solicitar acceso.</p>
         <div th:if="${registroExitoso}" class="alert alert-success" role="status">
-            Tu cuenta fue creada y quedó pendiente de activación por el superadministrador.
+            Creamos tu cuenta. Revisa tu correo y confirma el enlace; después, el superadministrador debe activarla para que puedas iniciar sesión.
         </div>
         <form th:action="@{/registro}" th:object="${registro}" method="post">
             <div class="field">
