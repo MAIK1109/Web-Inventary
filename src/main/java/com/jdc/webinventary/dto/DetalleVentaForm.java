@@ -2,6 +2,7 @@ package com.jdc.webinventary.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Min;
 
 public class DetalleVentaForm {
 
@@ -12,6 +13,7 @@ public class DetalleVentaForm {
     @Min(value = 1, message = "La cantidad debe ser mayor que cero")
     private Integer cantidad;
 
+    @Min(value = 0, message = "El precio no puede ser negativo")
     private Integer precioUnitario;
     private Integer costoUnitarioHistorico;
     private String medioPago;

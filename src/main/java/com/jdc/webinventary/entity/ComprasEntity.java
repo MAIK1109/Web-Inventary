@@ -79,6 +79,11 @@ public class ComprasEntity implements Serializable {
         return detalles;
     }
 
+    public void addDetalle(DetalleComprasEntity detalle) {
+        detalles.add(detalle);
+        detalle.setCompra(this);
+    }
+
     public void setDetalles(List<DetalleComprasEntity> detalles) {
         this.detalles = detalles;
     }
