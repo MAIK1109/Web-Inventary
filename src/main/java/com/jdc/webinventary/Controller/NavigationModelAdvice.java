@@ -19,4 +19,10 @@ public class NavigationModelAdvice {
         return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_SUPERADMIN".equals(authority.getAuthority()));
     }
+
+    @ModelAttribute("isAdmin")
+    public boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMINISTRADOR".equals(authority.getAuthority()));
+    }
 }

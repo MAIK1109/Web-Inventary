@@ -14,3 +14,11 @@ Con una sesión iniciada, abre `/clientes` para registrar identificación, nombr
 ## Recuperación de acceso
 
 En la pantalla de inicio de sesión, selecciona **¿Olvidaste tu contraseña?**. Configura el envío de correo con las variables de entorno `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH` y `MAIL_SMTP_STARTTLS`; establece `PASSWORD_RESET_BASE_URL` con la dirección pública de la aplicación. El enlace usa un token de un solo uso que vence en 30 minutos. La contraseña nueva nunca se envía por correo.
+
+## Registro de aportes
+
+Los usuarios con sesión activa pueden enviar aportes desde `/aportes/mi-cuenta`. El soporte es opcional; se aceptan PDF, PNG y JPG de hasta 5 MB y se guardan en `uploads/aportes` (configurable con `APORTES_UPLOAD_DIR`). Cada aporte queda pendiente hasta que lo revise el superadministrador.
+
+## Dashboard financiero
+
+El dashboard está disponible para cuentas con rol de administrador o superadministrador en `/dashboard/financiero`. Permite registrar gastos y consultar ventas confirmadas, costo de mercancía, utilidad estimada, margen neto y evolución mensual. Para ventas antiguas sin costo histórico, se usa el costo de la compra confirmada más reciente anterior a la venta; si no existe un costo de referencia, esa línea se señala en el dashboard.

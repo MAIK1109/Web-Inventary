@@ -14,6 +14,7 @@ public interface InversionesRepository extends JpaRepository<InversionesEntity, 
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "usuario")
     List<InversionesEntity> findAllByOrderByFechaDesc();
     List<InversionesEntity> findByUsuario_IdUsuarioOrderByFechaDesc(Integer usuarioId);
+    java.util.Optional<InversionesEntity> findByIdInversionAndUsuario_IdUsuario(Integer idInversion, Integer usuarioId);
     List<InversionesEntity> findByEstadoOrderByFechaDesc(Byte estado);
 
     @Modifying

@@ -4,6 +4,8 @@ import com.jdc.webinventary.entity.InversionesEntity;
 import com.jdc.webinventary.entity.UsuariosEntity;
 import com.jdc.webinventary.repository.InversionesRepository;
 import com.jdc.webinventary.repository.UsuariosRepository;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +21,13 @@ public class AportesService {
 
     private final InversionesRepository inversiones;
     private final UsuariosRepository usuarios;
+    private final AporteSoporteStorageService soporteStorage;
 
-    public AportesService(InversionesRepository inversiones, UsuariosRepository usuarios) {
+    public AportesService(InversionesRepository inversiones, UsuariosRepository usuarios,
+                          AporteSoporteStorageService soporteStorage) {
         this.inversiones = inversiones;
         this.usuarios = usuarios;
+        this.soporteStorage = soporteStorage;
     }
 
     public List<InversionesEntity> listarPendientes() {
@@ -47,15 +52,54 @@ public class AportesService {
 
     @Transactional
     public void registrar(Integer usuarioId, int monto, String medioPago) {
-        if (monto <= 0) throw new IllegalArgumentException("El monto del aporte debe ser mayor que cero.");
+        registrar(usuarioId, monto, LocalDate.now(), medioPago, null);
+    }
+
+    @Transactional
+    public void registrar(Integer usuarioId, Integer monto, LocalDate fecha,
+                          String medioPago, MultipartFile soporte) {
+        if (monto == null || monto <= 0) throw new IllegalArgumentException("El monto del aporte debe ser mayor que cero.");
+        if (fecha == null) throw new IllegalArgumentException("La fecha del aporte es obligatoria.");
+        if (medioPago == null || medioPago.isBlank() || medioPago.length() > 45) {
+            throw new IllegalArgumentException("Selecciona un medio de pago válido.");
+        }
         UsuariosEntity usuario = usuarios.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
-        inversiones.save(new InversionesEntity(null, monto, LocalDate.now(), medioPago,
-                PENDIENTE, null, usuario));
+        String archivo = soporteStorage.guardar(soporte);
+        try {
+            InversionesEntity aporte = new InversionesEntity(null, monto, fecha, medioPago.trim(),
+                    PENDIENTE, null, usuario);
+            aporte.setSoporteArchivo(archivo);
+            inversiones.saveAndFlush(aporte);
+        } catch (RuntimeException ex) {
+            soporteStorage.eliminar(archivo);
+            throw ex;
+        }
     }
 
     public List<InversionesEntity> listarUsuario(Integer usuarioId) {
         return inversiones.findByUsuario_IdUsuarioOrderByFechaDesc(usuarioId);
+    }
+
+    public Resource soporteParaUsuario(Integer aporteId, Integer usuarioId) {
+        InversionesEntity aporte = inversiones.findByIdInversionAndUsuario_IdUsuario(aporteId, usuarioId)
+                .orElseThrow(AporteNoEncontradoException::new);
+        return cargarSoporte(aporte);
+    }
+
+    public Resource soporteParaRevision(Integer aporteId) {
+        InversionesEntity aporte = inversiones.findById(aporteId)
+                .orElseThrow(AporteNoEncontradoException::new);
+        return cargarSoporte(aporte);
+    }
+
+    private Resource cargarSoporte(InversionesEntity aporte) {
+        if (aporte.getSoporteArchivo() == null) throw new AporteNoEncontradoException();
+        try {
+            return soporteStorage.cargar(aporte.getSoporteArchivo());
+        } catch (AporteSoporteStorageService.AporteSoporteNoEncontradoException ex) {
+            throw new AporteNoEncontradoException();
+        }
     }
 
     @Transactional
@@ -69,5 +113,6 @@ public class AportesService {
 
     public static class AporteNoEncontradoException extends RuntimeException {
         public AporteNoEncontradoException(String mensaje) { super(mensaje); }
+        public AporteNoEncontradoException() { super("El aporte o su soporte no existe."); }
     }
 }

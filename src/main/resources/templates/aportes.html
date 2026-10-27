@@ -11,18 +11,27 @@
     <section class="table-card">
         <div class="table-top"><div><h2>Registrar aporte</h2><p>El aporte quedará pendiente hasta su revisión.</p></div>
             <strong th:text="|Capital aprobado: ${totalUsuario}|">Capital aprobado: 0</strong></div>
-        <form th:action="@{/aportes/mi-cuenta}" method="post" class="form-grid">
-            <label>Monto<input type="number" name="monto" min="1" step="1" required></label>
-            <label>Medio de pago<input type="text" name="medioPago" maxlength="45" required></label>
-            <button class="button button-primary" type="submit">Enviar para aprobación</button>
+        <form th:action="@{/aportes/mi-cuenta}" th:object="${formAporte}" method="post" enctype="multipart/form-data" class="form-grid">
+            <div class="field"><label for="monto">Monto</label><input id="monto" type="number" th:field="*{monto}" min="1" step="1" required>
+                <small class="field-error" th:errors="*{monto}"></small></div>
+            <div class="field"><label for="fecha">Fecha del aporte</label><input id="fecha" type="date" th:field="*{fecha}" required>
+                <small class="field-error" th:errors="*{fecha}"></small></div>
+            <div class="field"><label for="medioPago">Medio de pago</label>
+                <select id="medioPago" th:field="*{medioPago}" required><option value="">Selecciona</option><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Consignación</option><option>Otro</option></select>
+                <small class="field-error" th:errors="*{medioPago}"></small></div>
+            <div class="field"><label for="soporte">Soporte <span class="field-hint">Opcional · PDF, PNG o JPG, máximo 5 MB</span></label>
+                <input id="soporte" type="file" th:field="*{soporte}" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
+                <small class="field-error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></small></div>
+            <div class="form-actions"><button class="button button-primary" type="submit">Enviar para aprobación</button></div>
         </form>
     </section>
     <section class="table-card">
         <div class="table-top"><div><h2>Historial</h2><p>Los aportes pendientes o rechazados no se suman al capital.</p></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Monto</th><th>Medio de pago</th><th>Estado</th></tr></thead>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Monto</th><th>Medio de pago</th><th>Soporte</th><th>Estado</th></tr></thead>
             <tbody><tr th:each="aporte : ${aportes}"><td th:text="${aporte.fecha}"></td><td th:text="${aporte.monto}"></td><td th:text="${aporte.medioPago}"></td>
+                <td><a th:if="${aporte.soporteArchivo != null}" th:href="@{/aportes/mi-cuenta/{id}/soporte(id=${aporte.idInversion})}">Ver soporte</a><span th:if="${aporte.soporteArchivo == null}">—</span></td>
                 <td th:text="${aporte.estado == 0 ? 'PENDIENTE' : (aporte.estado == 1 ? 'APROBADO' : 'RECHAZADO')}"></td></tr>
-            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state" colspan="4">Aún no has registrado aportes.</td></tr></tbody>
+            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state" colspan="5">Aún no has registrado aportes.</td></tr></tbody>
         </table></div>
     </section>
 </main>

@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/registro", "/login", "/verificar-correo", "/recuperar-acceso/**", "/error", "/images/**", "/css/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("SUPERADMIN")
+                        .requestMatchers("/dashboard/financiero", "/dashboard/financiero/**")
+                        .hasAnyRole("SUPERADMIN", "ADMINISTRADOR")
                         .requestMatchers("/cuenta/**").authenticated()
                         .anyRequest().authenticated()
                 )
