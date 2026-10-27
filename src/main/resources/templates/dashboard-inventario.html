@@ -7,13 +7,36 @@
     <header class="page-heading"><p class="eyebrow">Control de existencias</p><h1>Dashboard de inventario</h1>
         <p>Consulta las existencias, identifica productos que requieren reposición y revisa los movimientos recientes.</p></header>
     <section class="action-grid" style="margin-bottom: 20px">
-        <article class="info-card"><p class="eyebrow">Productos</p><h2 th:text="${#lists.size(resumen.productos)}">0</h2><p>Referencias registradas</p></article>
+        <article class="info-card"><p class="eyebrow">Productos</p><h2 th:text="${resumen.totalProductos}">0</h2><p>Referencias registradas</p></article>
         <article class="info-card"><p class="eyebrow">Unidades</p><h2 th:text="${resumen.unidadesEnExistencia}">0</h2><p>Unidades en existencia</p></article>
         <article class="info-card"><p class="eyebrow">Stock bajo</p><h2 th:text="${#lists.size(resumen.bajos)}">0</h2><p>En o por debajo del mínimo</p></article>
         <article class="info-card"><p class="eyebrow">Agotados</p><h2 th:text="${#lists.size(resumen.agotados)}">0</h2><p>Sin unidades disponibles</p></article>
     </section>
+    <section class="table-card" style="margin-bottom: 20px">
+        <div class="table-top"><div><h2>Filtrar por estado</h2><p>Agotado: 0 unidades. Stock bajo: desde 1 hasta el mínimo, inclusive.</p></div></div>
+        <form method="get" th:action="@{/dashboard/inventario}" class="form-grid">
+            <label>Estado del producto
+                <select name="estado">
+                    <option value="TODOS" th:selected="${resumen.filtroEstado == 'TODOS'}">Todos</option>
+                    <option value="AGOTADO" th:selected="${resumen.filtroEstado == 'AGOTADO'}">Agotado</option>
+                    <option value="STOCK_BAJO" th:selected="${resumen.filtroEstado == 'STOCK_BAJO'}">Stock bajo</option>
+                    <option value="DISPONIBLE" th:selected="${resumen.filtroEstado == 'DISPONIBLE'}">Disponible</option>
+                </select>
+            </label>
+            <button class="button button-primary" type="submit">Aplicar filtro</button>
+        </form>
+    </section>
+    <section class="table-card" style="margin-bottom: 20px">
+        <div class="table-top"><div><h2>Cambios de estado recientes</h2><p>El sistema registra los cambios de estado detectados al consultar el inventario.</p></div></div>
+        <div th:if="${#lists.isEmpty(resumen.cambiosAlerta)}" class="alert alert-info" role="status">No se han detectado cambios de estado desde que se inició el seguimiento.</div>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(resumen.cambiosAlerta)}"><table class="data-table"><thead><tr><th>Fecha del cambio</th><th>Producto</th><th>Estado anterior</th><th>Nuevo estado</th><th>Existencias</th></tr></thead>
+            <tbody><tr th:each="cambio : ${resumen.cambiosAlerta}"><td th:text="${cambio.fecha}"></td><td th:text="${cambio.producto.nombre}"></td>
+                <td th:text="${cambio.estadoAnterior}"></td><td><strong th:text="${cambio.estadoNuevo}"></strong></td>
+                <td th:text="${cambio.existencias}"></td></tr></tbody>
+        </table></div>
+    </section>
     <section class="table-card">
-        <div class="table-top"><div><h2>Existencias y stock mínimo</h2><p>Se resaltan los productos agotados o en nivel bajo.</p></div></div>
+        <div class="table-top"><div><h2>Existencias y stock mínimo</h2><p th:text="|${#lists.size(resumen.productos)} productos en este filtro|"></p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Código</th><th>Producto</th><th>Existencias</th><th>Stock mínimo</th><th>Estado</th></tr></thead>
             <tbody><tr th:each="producto : ${resumen.productos}">
                 <td th:text="${producto.codigo}"></td><td th:text="${producto.nombre}"></td>
@@ -22,7 +45,7 @@
                 <td><span class="status-pill" th:classappend="${producto.stockActual == null or producto.stockActual <= 0 ? 'status-blocked' : (producto.stockMinimo != null and producto.stockActual <= producto.stockMinimo ? 'status-pending' : 'status-active')}"
                           th:text="${producto.stockActual == null or producto.stockActual <= 0 ? 'AGOTADO' : (producto.stockMinimo != null and producto.stockActual <= producto.stockMinimo ? 'STOCK BAJO' : 'DISPONIBLE')}"></span></td>
             </tr>
-            <tr th:if="${#lists.isEmpty(resumen.productos)}"><td class="empty-state" colspan="5">No hay productos registrados.</td></tr></tbody>
+            <tr th:if="${#lists.isEmpty(resumen.productos)}"><td class="empty-state" colspan="5">No hay productos que coincidan con este estado.</td></tr></tbody>
         </table></div>
     </section>
     <section class="table-card" style="margin-top: 20px">

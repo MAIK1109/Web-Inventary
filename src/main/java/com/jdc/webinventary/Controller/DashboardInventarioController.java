@@ -4,6 +4,7 @@ import com.jdc.webinventary.service.DashboardInventarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class DashboardInventarioController {
@@ -14,8 +15,9 @@ public class DashboardInventarioController {
     }
 
     @GetMapping("/dashboard/inventario")
-    public String mostrar(Model model) {
-        model.addAttribute("resumen", dashboard.generar());
+    public String mostrar(@RequestParam(required = false, defaultValue = "TODOS") String estado,
+                          Model model) {
+        model.addAttribute("resumen", dashboard.generar(estado));
         return "dashboard-inventario";
     }
 }
