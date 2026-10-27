@@ -8,6 +8,7 @@ import com.jdc.webinventary.entity.VentasEntity;
 import com.jdc.webinventary.repository.ClientesRepository;
 import com.jdc.webinventary.repository.ProductosRepository;
 import com.jdc.webinventary.repository.VentasRepository;
+import com.jdc.webinventary.repository.UsuariosRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,17 +21,25 @@ public class RegistroVentaService {
     private final ClientesRepository clientesRepository;
     private final ProductosRepository productosRepository;
     private final VentasRepository ventasRepository;
+    private final UsuariosRepository usuariosRepository;
 
     public RegistroVentaService(ClientesRepository clientesRepository,
                                 ProductosRepository productosRepository,
-                                VentasRepository ventasRepository) {
+                                VentasRepository ventasRepository,
+                                UsuariosRepository usuariosRepository) {
         this.clientesRepository = clientesRepository;
         this.productosRepository = productosRepository;
         this.ventasRepository = ventasRepository;
+        this.usuariosRepository = usuariosRepository;
     }
 
     @Transactional
     public VentasEntity registrar(Integer clienteId, List<DetalleVentaForm> detalles) {
+        return registrar(clienteId, null, detalles);
+    }
+
+    @Transactional
+    public VentasEntity registrar(Integer clienteId, Integer vendedorId, List<DetalleVentaForm> detalles) {
         if (detalles == null || detalles.isEmpty()) {
             throw new IllegalArgumentException("La venta debe incluir al menos un producto.");
         }
@@ -38,6 +47,10 @@ public class RegistroVentaService {
         ClientesEntity cliente = clientesRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("El cliente no existe."));
         VentasEntity venta = new VentasEntity(null, LocalDate.now(), (byte) 1, cliente);
+        if (vendedorId != null) {
+            venta.setVendedor(usuariosRepository.findById(vendedorId)
+                    .orElseThrow(() -> new IllegalArgumentException("El vendedor no existe.")));
+        }
 
         for (DetalleVentaForm item : detalles) {
             if (item.getCantidad() == null || item.getCantidad() <= 0) {

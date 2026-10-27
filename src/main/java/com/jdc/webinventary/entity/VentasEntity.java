@@ -28,6 +28,10 @@ public class VentasEntity implements Serializable {
     @JoinColumn(name = "cliente_idcliente", nullable = false)
     private ClientesEntity cliente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vendedor_idusuario")
+    private UsuariosEntity vendedor;
+
     // Relación 1:N con DetalleVentasEntity
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVentasEntity> detalles = new ArrayList<>();
@@ -100,6 +104,10 @@ public class VentasEntity implements Serializable {
     public void setCliente(ClientesEntity cliente) {
         this.cliente = cliente;
     }
+
+    public UsuariosEntity getVendedor() { return vendedor; }
+
+    public void setVendedor(UsuariosEntity vendedor) { this.vendedor = vendedor; }
 
     public List<DetalleVentasEntity> getDetalles() {
         return detalles;
