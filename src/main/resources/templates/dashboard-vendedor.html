@@ -29,6 +29,14 @@
             </table></div>
         </article>
     </section>
+    <section class="table-card" style="margin-bottom:20px">
+        <div class="table-top"><div><h2>Mis ventas</h2><p>Ventas asociadas a tu cuenta durante el período seleccionado.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="venta : ${resumen.detalleVentas}"><td th:text="${venta.numero}"></td><td th:text="${venta.fecha}"></td>
+                <td th:text="${venta.cliente}"></td><td th:text="${venta.cantidadProductos}"></td><td th:text="${venta.total}"></td><td th:text="${venta.estado}"></td></tr>
+                <tr th:if="${#lists.isEmpty(resumen.detalleVentas)}"><td class="empty-state" colspan="6">No tienes ventas en este período.</td></tr></tbody>
+        </table></div>
+    </section>
     <section class="table-card">
         <div class="table-top"><div><h2>Mi historial</h2><p>Solo muestra las ventas y los aportes asociados a tu cuenta.</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Movimiento</th><th>Monto</th><th>Estado</th></tr></thead>

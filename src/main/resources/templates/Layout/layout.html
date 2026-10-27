@@ -25,7 +25,7 @@
                 <details th:if="${isLoggedIn}" class="nav-dropdown">
                     <summary>Dashboards</summary>
                     <div class="nav-dropdown-menu">
-                        <a th:href="@{/dashboard/vendedor}">Mi dashboard</a>
+                        <a th:href="@{/dashboard/vendedor}">Vendedor</a>
                         <a th:href="@{/dashboard/comercial}">Comercial</a>
                         <a th:href="@{/dashboard/inventario}">Inventario</a>
                         <a th:if="${isSuperadmin or isAdmin}" th:href="@{/dashboard/financiero}">Financiero</a>
