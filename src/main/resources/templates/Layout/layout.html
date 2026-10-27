@@ -22,9 +22,14 @@
                 <a th:if="${isLoggedIn}" th:href="@{/proveedores}">Proveedores</a>
                 <a th:if="${isLoggedIn}" th:href="@{/compras}">Compras</a>
                 <a th:if="${isLoggedIn}" th:href="@{/ventas}">Ventas</a>
-                <a th:if="${isLoggedIn}" th:href="@{/dashboard/comercial}">Dashboard</a>
-                <a th:if="${isLoggedIn}" th:href="@{/dashboard/inventario}">Inventario</a>
-                <a th:if="${isSuperadmin or isAdmin}" th:href="@{/dashboard/financiero}">Finanzas</a>
+                <details th:if="${isLoggedIn}" class="nav-dropdown">
+                    <summary>Dashboards</summary>
+                    <div class="nav-dropdown-menu">
+                        <a th:href="@{/dashboard/comercial}">Comercial</a>
+                        <a th:href="@{/dashboard/inventario}">Inventario</a>
+                        <a th:if="${isSuperadmin or isAdmin}" th:href="@{/dashboard/financiero}">Financiero</a>
+                    </div>
+                </details>
                 <a th:if="${isLoggedIn}" th:href="@{/busqueda}">Búsqueda</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/usuarios}">Usuarios</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/aportes}">Aportes</a>
