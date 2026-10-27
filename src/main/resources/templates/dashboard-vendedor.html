@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Mi dashboard')} "></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Mi actividad</p><h1>Dashboard de vendedor</h1>
+        <p>Consulta tus aportes, ventas, productos vendidos y evolución durante el período elegido.</p></header>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
+    <section class="table-card">
+        <form method="get" th:action="@{/dashboard/vendedor}" class="form-grid">
+            <label>Desde<input type="date" name="desde" th:value="${resumen.desde}" required></label>
+            <label>Hasta<input type="date" name="hasta" th:value="${resumen.hasta}" required></label>
+            <button class="button button-primary" type="submit">Actualizar período</button>
+        </form>
+    </section>
+    <section class="action-grid" style="margin:20px 0">
+        <article class="info-card"><p class="eyebrow">Aportes confirmados</p><h2 th:text="${resumen.aportesConfirmados}">0</h2><p th:text="|${resumen.cantidadAportesConfirmados} aportes aprobados|"></p></article>
+        <article class="info-card"><p class="eyebrow">Ventas confirmadas</p><h2 th:text="${resumen.ventas}">0</h2><p th:text="|${resumen.cantidadVentas} ventas|"></p></article>
+    </section>
+    <section class="action-grid" style="margin-bottom:20px">
+        <article class="table-card"><div class="table-top"><div><h2>Productos vendidos</h2><p>Unidades en ventas confirmadas</p></div></div>
+            <ol><li th:each="producto : ${resumen.productosVendidos}" th:text="|${producto.nombre}: ${producto.unidades} unidades|"></li></ol>
+            <p th:if="${#lists.isEmpty(resumen.productosVendidos)}">No hay productos vendidos en este período.</p></article>
+        <article class="table-card"><div class="table-top"><div><h2>Evolución mensual</h2><p>Ventas y aportes confirmados</p></div></div>
+            <div class="table-wrap"><table class="data-table"><thead><tr><th>Mes</th><th>Ventas</th><th>Aportes</th></tr></thead>
+                <tbody><tr th:each="mes : ${resumen.evolucionMensual}"><td th:text="${mes.mes}"></td><td th:text="${mes.ventas}"></td><td th:text="${mes.aportesConfirmados}"></td></tr>
+                    <tr th:if="${#lists.isEmpty(resumen.evolucionMensual)}"><td class="empty-state" colspan="3">Sin datos para este período.</td></tr></tbody>
+            </table></div>
+        </article>
+    </section>
+    <section class="table-card">
+        <div class="table-top"><div><h2>Mi historial</h2><p>Solo muestra las ventas y los aportes asociados a tu cuenta.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Movimiento</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="movimiento : ${resumen.historial}"><td th:text="${movimiento.fecha}"></td><td th:text="${movimiento.concepto}"></td>
+                <td th:text="${movimiento.monto}"></td><td th:text="${movimiento.estado}"></td></tr>
+                <tr th:if="${#lists.isEmpty(resumen.historial)}"><td class="empty-state" colspan="4">Aún no tienes movimientos en este período.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
