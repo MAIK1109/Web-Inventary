@@ -19,6 +19,7 @@
             <div class="nav-links">
                 <a th:href="@{/}">Inicio</a>
                 <a th:if="${isLoggedIn}" th:href="@{/clientes}">Clientes</a>
+                <a th:if="${isLoggedIn}" th:href="@{/proveedores}">Proveedores</a>
                 <a th:if="${isLoggedIn}" th:href="@{/dashboard/comercial}">Dashboard</a>
                 <a th:if="${isLoggedIn}" th:href="@{/dashboard/inventario}">Inventario</a>
                 <a th:if="${isLoggedIn}" th:href="@{/busqueda}">Búsqueda</a>
