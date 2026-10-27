@@ -17,7 +17,7 @@
             <div class="field"><label for="fecha">Fecha del aporte</label><input id="fecha" type="date" th:field="*{fecha}" required>
                 <small class="field-error" th:errors="*{fecha}"></small></div>
             <div class="field"><label for="medioPago">Medio de pago</label>
-                <select id="medioPago" th:field="*{medioPago}" required><option value="">Selecciona</option><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Consignación</option><option>Otro</option></select>
+                <select id="medioPago" th:field="*{medioPago}" required><option value="">Selecciona</option><option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta</option><option value="Transferencia">Transferencia</option><option value="Consignación">Consignación</option><option value="Otro">Otro</option></select>
                 <small class="field-error" th:errors="*{medioPago}"></small></div>
             <div class="field"><label for="soporte">Soporte <span class="field-hint">Opcional · PDF, PNG o JPG, máximo 5 MB</span></label>
                 <input id="soporte" type="file" th:field="*{soporte}" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">

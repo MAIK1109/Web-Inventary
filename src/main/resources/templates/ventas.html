@@ -19,7 +19,7 @@
                     </select><small class="field-error" th:errors="*{clienteId}"></small></div>
                 <div class="field"><label for="medioPago">Medio de pago</label>
                     <select id="medioPago" th:field="*{medioPago}" required>
-                        <option value="">Selecciona medio de pago</option><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option><option>Otro</option>
+                        <option value="">Selecciona medio de pago</option><option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta</option><option value="Transferencia">Transferencia</option><option value="Otro">Otro</option>
                     </select><small class="field-error" th:errors="*{medioPago}"></small></div>
             </div>
             <h3>Productos</h3>
