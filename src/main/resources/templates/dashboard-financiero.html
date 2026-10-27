@@ -35,8 +35,8 @@
     </section>
     <section class="table-card" style="margin-top:20px">
         <div class="table-top"><div><h2>Registrar gasto</h2><p>Los gastos se incluyen en la utilidad neta estimada según su fecha.</p></div></div>
-        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
         <form th:action="@{/dashboard/financiero/gastos}" th:object="${gasto}" method="post" class="form-grid">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
             <input type="hidden" name="desde" th:value="${desde}"><input type="hidden" name="hasta" th:value="${hasta}">
             <div class="field"><label for="monto">Monto</label><input id="monto" type="number" min="1" step="1" th:field="*{monto}" required><small class="field-error" th:errors="*{monto}"></small></div>
             <div class="field"><label for="fecha">Fecha</label><input id="fecha" type="date" th:field="*{fecha}" required><small class="field-error" th:errors="*{fecha}"></small></div>
