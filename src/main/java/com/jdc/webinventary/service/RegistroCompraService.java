@@ -18,15 +18,18 @@ public class RegistroCompraService {
     private final ProductosRepository productos;
     private final UsuariosRepository usuarios;
     private final MovimientosInventariosRepository movimientos;
+    private final EstadoAlertaInventarioService estadoAlertas;
 
     public RegistroCompraService(ComprasRepository compras, ProveedoresRepository proveedores,
                                  ProductosRepository productos, UsuariosRepository usuarios,
-                                 MovimientosInventariosRepository movimientos) {
+                                 MovimientosInventariosRepository movimientos,
+                                 EstadoAlertaInventarioService estadoAlertas) {
         this.compras = compras;
         this.proveedores = proveedores;
         this.productos = productos;
         this.usuarios = usuarios;
         this.movimientos = movimientos;
+        this.estadoAlertas = estadoAlertas;
     }
 
     public List<ComprasEntity> listar() { return compras.findAllByOrderByFechaDesc(); }
@@ -57,6 +60,7 @@ public class RegistroCompraService {
                 throw new IllegalArgumentException("La cantidad supera el stock máximo permitido para " + producto.getNombre() + ".");
             }
             producto.setStockActual((int) stockNuevo);
+            estadoAlertas.registrarEstadoActual(producto);
 
             DetalleComprasEntity detalle = new DetalleComprasEntity();
             detalle.setProducto(producto);

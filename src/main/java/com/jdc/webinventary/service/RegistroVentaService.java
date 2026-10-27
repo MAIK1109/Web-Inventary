@@ -2,10 +2,7 @@ package com.jdc.webinventary.service;
 
 import com.jdc.webinventary.dto.DetalleVentaForm;
 import com.jdc.webinventary.dto.RegistroVentaForm;
-import com.jdc.webinventary.entity.ClientesEntity;
-import com.jdc.webinventary.entity.DetalleVentasEntity;
-import com.jdc.webinventary.entity.ProductosEntity;
-import com.jdc.webinventary.entity.VentasEntity;
+import com.jdc.webinventary.entity.*;
 import com.jdc.webinventary.repository.ClientesRepository;
 import com.jdc.webinventary.repository.ProductosRepository;
 import com.jdc.webinventary.repository.VentasRepository;
@@ -13,6 +10,8 @@ import com.jdc.webinventary.repository.UsuariosRepository;
 import com.jdc.webinventary.repository.MovimientosInventariosRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,17 +24,23 @@ public class RegistroVentaService {
     private final VentasRepository ventasRepository;
     private final UsuariosRepository usuariosRepository;
     private final MovimientosInventariosRepository movimientosRepository;
+    private final EstadoAlertaInventarioService estadoAlertas;
+    private final EntityManager entityManager;
 
     public RegistroVentaService(ClientesRepository clientesRepository,
                                 ProductosRepository productosRepository,
                                 VentasRepository ventasRepository,
                                 UsuariosRepository usuariosRepository,
-                                MovimientosInventariosRepository movimientosRepository) {
+                                MovimientosInventariosRepository movimientosRepository,
+                                EstadoAlertaInventarioService estadoAlertas,
+                                EntityManager entityManager) {
         this.clientesRepository = clientesRepository;
         this.productosRepository = productosRepository;
         this.ventasRepository = ventasRepository;
         this.usuariosRepository = usuariosRepository;
         this.movimientosRepository = movimientosRepository;
+        this.estadoAlertas = estadoAlertas;
+        this.entityManager = entityManager;
     }
 
     @Transactional
@@ -86,6 +91,8 @@ public class RegistroVentaService {
             if (productosRepository.descontarStockSiDisponible(producto.getIdProducto(), item.getCantidad()) != 1) {
                 throw new StockInsuficienteException(producto.getNombre());
             }
+            entityManager.refresh(producto, LockModeType.PESSIMISTIC_WRITE);
+            estadoAlertas.registrarEstadoActual(producto);
 
             Integer precio = usarPrecioCatalogo ? producto.getPrecioVenta() : item.getPrecioUnitario();
             if (precio == null || precio < 0) {
