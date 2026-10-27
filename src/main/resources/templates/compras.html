@@ -7,10 +7,10 @@
     <header class="page-heading"><p class="eyebrow">Abastecimiento</p><h1>Compras</h1>
         <p>Registra y confirma compras para aumentar las existencias y dejar trazabilidad del ingreso.</p></header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
-    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
     <section class="form-card">
         <h2>Registrar y confirmar compra</h2>
         <form th:action="@{/compras}" th:object="${compra}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
             <div class="form-grid">
                 <div class="field"><label for="proveedorId">Proveedor</label>
                     <select id="proveedorId" th:field="*{proveedorId}" required>

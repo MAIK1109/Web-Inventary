@@ -7,10 +7,10 @@
     <header class="page-heading"><p class="eyebrow">Punto de venta</p><h1>Ventas</h1>
         <p>Registra cliente, productos y medio de pago. El vendedor se toma de tu sesión.</p></header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
-    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
     <section class="form-card">
         <h2>Registrar y confirmar venta</h2>
         <form th:action="@{/ventas}" th:object="${venta}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
             <div class="form-grid">
                 <div class="field"><label for="clienteId">Cliente</label>
                     <select id="clienteId" th:field="*{clienteId}" required>
