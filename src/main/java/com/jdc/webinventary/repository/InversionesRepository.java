@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ public interface InversionesRepository extends JpaRepository<InversionesEntity, 
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "usuario")
     List<InversionesEntity> findAllByOrderByFechaDesc();
     List<InversionesEntity> findByUsuario_IdUsuarioOrderByFechaDesc(Integer usuarioId);
+    List<InversionesEntity> findByUsuario_IdUsuarioAndFechaBetweenOrderByFechaDesc(
+            Integer usuarioId, LocalDate desde, LocalDate hasta);
     java.util.Optional<InversionesEntity> findByIdInversionAndUsuario_IdUsuario(Integer idInversion, Integer usuarioId);
     List<InversionesEntity> findByEstadoOrderByFechaDesc(Byte estado);
 

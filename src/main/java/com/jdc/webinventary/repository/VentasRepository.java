@@ -16,4 +16,8 @@ public interface VentasRepository extends JpaRepository<VentasEntity, Integer> {
 
     @EntityGraph(attributePaths = {"cliente", "detalles", "detalles.producto"})
     List<VentasEntity> findByVendedor_IdUsuarioOrderByFechaDesc(Integer usuarioId);
+
+    @EntityGraph(attributePaths = {"cliente", "detalles", "detalles.producto"})
+    List<VentasEntity> findByVendedor_IdUsuarioAndFechaBetweenOrderByFechaDesc(
+            Integer usuarioId, LocalDate desde, LocalDate hasta);
 }
