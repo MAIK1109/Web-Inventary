@@ -1,6 +1,7 @@
 package com.jdc.webinventary.service;
 
 import com.jdc.webinventary.dto.DetalleVentaForm;
+import com.jdc.webinventary.dto.RegistroVentaForm;
 import com.jdc.webinventary.entity.ClientesEntity;
 import com.jdc.webinventary.entity.DetalleVentasEntity;
 import com.jdc.webinventary.entity.ProductosEntity;
@@ -9,6 +10,7 @@ import com.jdc.webinventary.repository.ClientesRepository;
 import com.jdc.webinventary.repository.ProductosRepository;
 import com.jdc.webinventary.repository.VentasRepository;
 import com.jdc.webinventary.repository.UsuariosRepository;
+import com.jdc.webinventary.repository.MovimientosInventariosRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,24 +24,42 @@ public class RegistroVentaService {
     private final ProductosRepository productosRepository;
     private final VentasRepository ventasRepository;
     private final UsuariosRepository usuariosRepository;
+    private final MovimientosInventariosRepository movimientosRepository;
 
     public RegistroVentaService(ClientesRepository clientesRepository,
                                 ProductosRepository productosRepository,
                                 VentasRepository ventasRepository,
-                                UsuariosRepository usuariosRepository) {
+                                UsuariosRepository usuariosRepository,
+                                MovimientosInventariosRepository movimientosRepository) {
         this.clientesRepository = clientesRepository;
         this.productosRepository = productosRepository;
         this.ventasRepository = ventasRepository;
         this.usuariosRepository = usuariosRepository;
-    }
-
-    @Transactional
-    public VentasEntity registrar(Integer clienteId, List<DetalleVentaForm> detalles) {
-        return registrar(clienteId, null, detalles);
+        this.movimientosRepository = movimientosRepository;
     }
 
     @Transactional
     public VentasEntity registrar(Integer clienteId, Integer vendedorId, List<DetalleVentaForm> detalles) {
+        return registrarInterno(clienteId, vendedorId, detalles, false);
+    }
+
+    @Transactional
+    public VentasEntity registrar(RegistroVentaForm form, Integer vendedorId) {
+        if (form.getClienteId() == null || form.getMedioPago() == null || form.getDetalles() == null
+                || form.getDetalles().isEmpty()) {
+            throw new IllegalArgumentException("Completa el cliente, el medio de pago y al menos un producto.");
+        }
+        for (DetalleVentaForm item : form.getDetalles()) {
+            if (item != null) item.setMedioPago(form.getMedioPago().trim());
+        }
+        return registrarInterno(form.getClienteId(), vendedorId, form.getDetalles(), true);
+    }
+
+    private VentasEntity registrarInterno(Integer clienteId, Integer vendedorId,
+                                          List<DetalleVentaForm> detalles, boolean usarPrecioCatalogo) {
+        if (vendedorId == null) {
+            throw new IllegalArgumentException("La venta debe estar asociada al vendedor que la registra.");
+        }
         if (detalles == null || detalles.isEmpty()) {
             throw new IllegalArgumentException("La venta debe incluir al menos un producto.");
         }
@@ -51,10 +71,11 @@ public class RegistroVentaService {
             venta.setVendedor(usuariosRepository.findById(vendedorId)
                     .orElseThrow(() -> new IllegalArgumentException("El vendedor no existe.")));
         }
+        long total = 0;
 
         for (DetalleVentaForm item : detalles) {
-            if (item.getCantidad() == null || item.getCantidad() <= 0) {
-                throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
+            if (item == null || item.getProductoId() == null || item.getCantidad() == null || item.getCantidad() <= 0) {
+                throw new IllegalArgumentException("Cada detalle debe tener producto y cantidad mayor que cero.");
             }
 
             ProductosEntity producto = productosRepository.findByIdForUpdate(item.getProductoId())
@@ -66,13 +87,39 @@ public class RegistroVentaService {
                 throw new StockInsuficienteException(producto.getNombre());
             }
 
+            Integer precio = usarPrecioCatalogo ? producto.getPrecioVenta() : item.getPrecioUnitario();
+            if (precio == null || precio < 0) {
+                throw new IllegalArgumentException("El producto " + producto.getNombre() + " no tiene un precio de venta válido.");
+            }
+            try {
+                total = Math.addExact(total, Math.multiplyExact((long) item.getCantidad(), precio));
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException("El total de la venta excede el valor máximo permitido.");
+            }
+
             DetalleVentasEntity detalle = new DetalleVentasEntity(
-                    null, item.getCantidad(), item.getPrecioUnitario(),
+                    null, item.getCantidad(), precio,
                     item.getCostoUnitarioHistorico(), item.getMedioPago(), venta, producto);
             venta.addDetalle(detalle);
         }
 
-        return ventasRepository.save(venta);
+        VentasEntity guardada = ventasRepository.saveAndFlush(venta);
+        for (DetalleVentasEntity detalle : guardada.getDetalles()) {
+            movimientosRepository.save(new MovimientosInventariosEntity(null, "SALIDA_VENTA", detalle.getCantidad(),
+                    "VENTA-" + guardada.getIdVenta(), guardada.getFecha(),
+                    guardada.getVendedor(), detalle.getProducto()));
+        }
+        return guardada;
+    }
+
+    public List<VentasEntity> listar() { return ventasRepository.findAllByOrderByFechaDesc(); }
+
+    public long calcularTotal(VentasEntity venta) {
+        long total = 0;
+        for (DetalleVentasEntity detalle : venta.getDetalles()) {
+            total = Math.addExact(total, Math.multiplyExact((long) detalle.getCantidad(), detalle.getPrecioUnitario()));
+        }
+        return total;
     }
 
     public static class StockInsuficienteException extends RuntimeException {
