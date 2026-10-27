@@ -30,6 +30,9 @@ public class InversionesEntity implements Serializable {
     @Column(name = "aprobado_por", length = 45)
     private String aprobadoPor;
 
+    @Column(name = "soporte_archivo", length = 100)
+    private String soporteArchivo;
+
     // Relación Muchos a Uno con UsuariosEntity (Usuario_idUsuario)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "Usuario_idUsuario", nullable = false)
@@ -97,6 +100,9 @@ public class InversionesEntity implements Serializable {
     public void setAprobadoPor(String aprobadoPor) {
         this.aprobadoPor = aprobadoPor;
     }
+
+    public String getSoporteArchivo() { return soporteArchivo; }
+    public void setSoporteArchivo(String soporteArchivo) { this.soporteArchivo = soporteArchivo; }
 
     public UsuariosEntity getUsuario() {
         return usuario;
