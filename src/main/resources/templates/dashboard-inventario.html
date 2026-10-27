@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Dashboard de inventario')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Control de existencias</p><h1>Dashboard de inventario</h1>
+        <p>Consulta las existencias, identifica productos que requieren reposición y revisa los movimientos recientes.</p></header>
+    <section class="action-grid" style="margin-bottom: 20px">
+        <article class="info-card"><p class="eyebrow">Productos</p><h2 th:text="${#lists.size(resumen.productos)}">0</h2><p>Referencias registradas</p></article>
+        <article class="info-card"><p class="eyebrow">Unidades</p><h2 th:text="${resumen.unidadesEnExistencia}">0</h2><p>Unidades en existencia</p></article>
+        <article class="info-card"><p class="eyebrow">Stock bajo</p><h2 th:text="${#lists.size(resumen.bajos)}">0</h2><p>En o por debajo del mínimo</p></article>
+        <article class="info-card"><p class="eyebrow">Agotados</p><h2 th:text="${#lists.size(resumen.agotados)}">0</h2><p>Sin unidades disponibles</p></article>
+    </section>
+    <section class="table-card">
+        <div class="table-top"><div><h2>Existencias y stock mínimo</h2><p>Se resaltan los productos agotados o en nivel bajo.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Código</th><th>Producto</th><th>Existencias</th><th>Stock mínimo</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="producto : ${resumen.productos}">
+                <td th:text="${producto.codigo}"></td><td th:text="${producto.nombre}"></td>
+                <td th:text="${producto.stockActual == null ? 0 : producto.stockActual}"></td>
+                <td th:text="${producto.stockMinimo == null ? '—' : producto.stockMinimo}"></td>
+                <td><span class="status-pill" th:classappend="${producto.stockActual == null or producto.stockActual <= 0 ? 'status-blocked' : (producto.stockMinimo != null and producto.stockActual <= producto.stockMinimo ? 'status-pending' : 'status-active')}"
+                          th:text="${producto.stockActual == null or producto.stockActual <= 0 ? 'AGOTADO' : (producto.stockMinimo != null and producto.stockActual <= producto.stockMinimo ? 'STOCK BAJO' : 'DISPONIBLE')}"></span></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(resumen.productos)}"><td class="empty-state" colspan="5">No hay productos registrados.</td></tr></tbody>
+        </table></div>
+    </section>
+    <section class="table-card" style="margin-top: 20px">
+        <div class="table-top"><div><h2>Movimientos recientes</h2><p>Últimos 10 movimientos registrados.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Documento</th><th>Usuario</th></tr></thead>
+            <tbody><tr th:each="movimiento : ${resumen.movimientosRecientes}">
+                <td th:text="${movimiento.fecha}"></td><td th:text="${movimiento.producto.nombre}"></td><td th:text="${movimiento.tipo}"></td>
+                <td th:text="${movimiento.cantidad}"></td><td th:text="${movimiento.documentoOrigen}"></td><td th:text="${movimiento.usuario.nombre}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(resumen.movimientosRecientes)}"><td class="empty-state" colspan="6">Aún no hay movimientos de inventario.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
