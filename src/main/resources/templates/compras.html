@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Registrar compra')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Abastecimiento</p><h1>Compras</h1>
+        <p>Registra y confirma compras para aumentar las existencias y dejar trazabilidad del ingreso.</p></header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
+    <section class="form-card">
+        <h2>Registrar y confirmar compra</h2>
+        <form th:action="@{/compras}" th:object="${compra}" method="post">
+            <div class="form-grid">
+                <div class="field"><label for="proveedorId">Proveedor</label>
+                    <select id="proveedorId" th:field="*{proveedorId}" required>
+                        <option value="">Selecciona proveedor</option>
+                        <option th:each="proveedor : ${proveedores}" th:value="${proveedor.idProveedor}" th:text="${proveedor.nombre}"></option>
+                    </select><small class="field-error" th:errors="*{proveedorId}"></small></div>
+                <div class="field"><label for="fecha">Fecha de compra</label>
+                    <input id="fecha" type="date" th:field="*{fecha}" required><small class="field-error" th:errors="*{fecha}"></small></div>
+            </div>
+            <h3>Detalle de la compra</h3>
+            <div id="detalles-compra">
+                <div class="form-grid purchase-line" th:each="detalle, stat : *{detalles}">
+                    <div class="field"><label>Producto</label>
+                        <select th:field="*{detalles[__${stat.index}__].productoId}" required>
+                            <option value="">Selecciona producto</option>
+                            <option th:each="producto : ${productos}" th:value="${producto.idProducto}" th:text="|${producto.codigo} — ${producto.nombre} (stock ${producto.stockActual})|"></option>
+                        </select><small class="field-error" th:errors="*{detalles[__${stat.index}__].productoId}"></small></div>
+                    <div class="field"><label>Cantidad</label>
+                        <input type="number" min="1" step="1" th:field="*{detalles[__${stat.index}__].cantidad}" required>
+                        <small class="field-error" th:errors="*{detalles[__${stat.index}__].cantidad}"></small></div>
+                    <div class="field"><label>Costo unitario</label>
+                        <input type="number" min="0" step="1" th:field="*{detalles[__${stat.index}__].costoUnitario}" required>
+                        <small class="field-error" th:errors="*{detalles[__${stat.index}__].costoUnitario}"></small></div>
+                    <button class="button button-danger button-small remove-line" type="button" th:if="${stat.index > 0}">Quitar</button>
+                </div>
+            </div>
+            <template id="detalle-template"><div class="form-grid purchase-line">
+                <div class="field"><label>Producto</label><select data-field="productoId" required>
+                    <option value="">Selecciona producto</option>
+                    <option th:each="producto : ${productos}" th:value="${producto.idProducto}" th:text="|${producto.codigo} — ${producto.nombre} (stock ${producto.stockActual})|"></option>
+                </select></div>
+                <div class="field"><label>Cantidad</label><input data-field="cantidad" type="number" min="1" step="1" required></div>
+                <div class="field"><label>Costo unitario</label><input data-field="costoUnitario" type="number" min="0" step="1" required></div>
+                <button class="button button-danger button-small remove-line" type="button">Quitar</button>
+            </div></template>
+            <div class="form-actions"><button id="agregar-detalle" class="button button-secondary" type="button">Agregar producto</button>
+                <button class="button button-primary" type="submit">Confirmar compra</button></div>
+        </form>
+    </section>
+    <section class="table-card" style="margin-top: 20px">
+        <div class="table-top"><div><h2>Compras recientes</h2><p>Las compras confirmadas generan entradas de inventario.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Proveedor</th><th>Productos</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="item : ${compras}"><td th:text="${item.idCompra}"></td><td th:text="${item.fecha}"></td><td th:text="${item.proveedor.nombre}"></td>
+                <td th:text="${#lists.size(item.detalles)}"></td><td th:text="${item.estado == 1 ? 'CONFIRMADA' : item.estado}"></td></tr>
+                <tr th:if="${#lists.isEmpty(compras)}"><td class="empty-state" colspan="5">Aún no hay compras registradas.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<script>
+    (() => {
+        const container = document.getElementById('detalles-compra');
+        const template = document.getElementById('detalle-template');
+        document.getElementById('agregar-detalle').addEventListener('click', () => {
+            const clone = template.content.cloneNode(true);
+            const index = container.querySelectorAll('.purchase-line').length;
+            clone.querySelectorAll('[data-field]').forEach(input => {
+                input.name = `detalles[${index}].${input.dataset.field}`;
+                input.id = `detalles${index}.${input.dataset.field}`;
+            });
+            container.appendChild(clone);
+        });
+        container.addEventListener('click', event => {
+            if (event.target.classList.contains('remove-line') && container.querySelectorAll('.purchase-line').length > 1) {
+                event.target.closest('.purchase-line').remove();
+                container.querySelectorAll('.purchase-line').forEach((row, index) => {
+                    row.querySelectorAll('select, input').forEach(input => {
+                        const field = input.name.substring(input.name.lastIndexOf('.') + 1);
+                        input.name = `detalles[${index}].${field}`;
+                    });
+                });
+            }
+        });
+    })();
+</script>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
