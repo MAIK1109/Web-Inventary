@@ -10,3 +10,7 @@ En IntelliJ, configura ambas variables en **Run/Debug Configurations → Environ
 ## Registro de clientes
 
 Con una sesión iniciada, abre `/clientes` para registrar identificación, nombre, teléfono y correo opcional. El consentimiento para enviar comprobantes al correo es voluntario; si se otorga, se conserva también la fecha y hora. La identificación no se puede duplicar.
+
+## Recuperación de acceso
+
+En la pantalla de inicio de sesión, selecciona **¿Olvidaste tu contraseña?**. Configura el envío de correo con las variables de entorno `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH` y `MAIL_SMTP_STARTTLS`; establece `PASSWORD_RESET_BASE_URL` con la dirección pública de la aplicación. El enlace usa un token de un solo uso que vence en 30 minutos. La contraseña nueva nunca se envía por correo.
