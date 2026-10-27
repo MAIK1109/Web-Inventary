@@ -20,7 +20,9 @@
                 <a th:href="@{/}">Inicio</a>
                 <a th:if="${isLoggedIn}" th:href="@{/clientes}">Clientes</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/usuarios}">Usuarios</a>
+                <a th:if="${isSuperadmin}" th:href="@{/admin/aportes}">Aportes</a>
                 <a th:if="${isLoggedIn}" th:href="@{/cuenta}">Mi cuenta</a>
+                <a th:if="${isLoggedIn}" th:href="@{/aportes/mi-cuenta}">Mis aportes</a>
                 <a th:if="${!isLoggedIn}" th:href="@{/registro}">Crear cuenta</a>
                 <a th:if="${!isLoggedIn}" class="nav-login" th:href="@{/login}">Ingresar</a>
                 <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
