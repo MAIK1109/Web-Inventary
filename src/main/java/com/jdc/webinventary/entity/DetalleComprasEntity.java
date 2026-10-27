@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "detalles_compras")
-public class DetalleCompraEntity implements Serializable {
+public class DetalleComprasEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,16 +23,14 @@ public class DetalleCompraEntity implements Serializable {
     // Relación Mucho a Uno con CompraEntity (compra_idcompra)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "compra_idcompra", nullable = false)
-    private CompraEntity compra;
+    private ComprasEntity compra;
 
-    // Si ya tienes la entidad ProductoEntity creada, desmarca estas líneas:
-    /*
+    // Relación N:1 con ProductosEntity (producto_idproducto)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_idproducto", nullable = false)
-    private ProductoEntity producto;
-    */
+    private ProductosEntity producto;
 
-    public DetalleCompraEntity() {
+    public DetalleComprasEntity() {
     }
 
     public Integer getIdDetalleCompra() {
@@ -59,11 +57,19 @@ public class DetalleCompraEntity implements Serializable {
         this.costoUnitario = costoUnitario;
     }
 
-    public CompraEntity getCompra() {
+    public ComprasEntity getCompra() {
         return compra;
     }
 
-    public void setCompra(CompraEntity compra) {
+    public void setCompra(ComprasEntity compra) {
         this.compra = compra;
+    }
+
+    public ProductosEntity getProducto() {
+        return producto;
+    }
+
+    public void setProducto(ProductosEntity producto) {
+        this.producto = producto;
     }
 }

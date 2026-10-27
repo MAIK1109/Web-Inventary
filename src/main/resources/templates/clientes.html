@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Registrar cliente')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+
+<main class="page-wrap page-wrap-narrow">
+    <header class="page-heading">
+        <p class="eyebrow">Directorio</p>
+        <h1>Registrar cliente</h1>
+        <p>Guarda los datos de contacto y define si desea recibir sus comprobantes por correo.</p>
+    </header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+
+    <section class="form-card">
+        <form th:action="@{/clientes}" th:object="${cliente}" method="post">
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="identificacion">Número de identificación</label>
+                    <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45" autocomplete="off" placeholder="Documento o identificación tributaria">
+                    <small class="field-error" th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}"></small>
+                </div>
+                <div class="field field-full">
+                    <label for="nombre">Nombre completo</label>
+                    <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45" autocomplete="name" placeholder="Nombre y apellidos">
+                    <small class="field-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+                <div class="field">
+                    <label for="telefono">Teléfono</label>
+                    <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45" autocomplete="tel" placeholder="+57 300 000 0000">
+                    <small class="field-error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></small>
+                </div>
+                <div class="field">
+                    <label for="correo">Correo electrónico <span class="field-hint">Opcional</span></label>
+                    <input id="correo" type="email" th:field="*{correo}" maxlength="254" autocomplete="email" placeholder="nombre@correo.com">
+                    <small class="field-error" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></small>
+                </div>
+            </div>
+
+            <div class="checkbox-card">
+                <input id="consentimientoComprobantes" type="checkbox" th:field="*{consentimientoComprobantes}">
+                <div>
+                    <label for="consentimientoComprobantes">El cliente autoriza recibir comprobantes en su correo</label>
+                    <small class="field-hint">La autorización es opcional. Si se marca, debe indicarse un correo válido.</small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">Guardar cliente <span aria-hidden="true">→</span></button>
+                <a class="button button-secondary" th:href="@{/}">Cancelar</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>

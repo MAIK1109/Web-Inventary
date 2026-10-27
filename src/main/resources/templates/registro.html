@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Crear cuenta')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+
+<main class="auth-wrap">
+    <section class="auth-copy">
+        <div><p class="eyebrow">Empieza hoy</p><h1>Un espacio para trabajar mejor.</h1>
+            <p>Crea tu cuenta para acceder a las herramientas de gestión de Web Inventary.</p></div>
+        <p>Tu información personal se mantiene asociada a tu cuenta.</p>
+    </section>
+    <section class="auth-card">
+        <p class="eyebrow">Registro</p>
+        <h2>Crear cuenta</h2>
+        <p>Completa tus datos para solicitar acceso.</p>
+        <div th:if="${registroExitoso}" class="alert alert-success" role="status">
+            Tu cuenta fue creada y quedó pendiente de activación por el superadministrador.
+        </div>
+        <form th:action="@{/registro}" th:object="${registro}" method="post">
+            <div class="field">
+                <label for="identificacion">Identificación</label>
+                <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45" autocomplete="off" placeholder="Tu número de identificación">
+                <small class="field-error" th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}"></small>
+            </div>
+            <div class="field">
+                <label for="nombre">Nombre completo</label>
+                <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45" autocomplete="name" placeholder="Como apareces en tus documentos">
+                <small class="field-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+            </div>
+            <div class="field">
+                <label for="telefono">Teléfono</label>
+                <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45" autocomplete="tel" placeholder="+57 300 000 0000">
+                <small class="field-error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></small>
+            </div>
+            <div class="field">
+                <label for="correo">Correo electrónico</label>
+                <input id="correo" type="email" th:field="*{correo}" required maxlength="254" autocomplete="email" placeholder="nombre@correo.com">
+                <small class="field-error" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></small>
+            </div>
+            <div class="field">
+                <label for="password">Contraseña</label>
+                <input id="password" type="password" th:field="*{password}" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Crea una contraseña segura">
+                <small class="field-hint">Usa al menos 8 caracteres.</small>
+                <small class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+            </div>
+            <div class="form-actions"><button class="button button-primary" type="submit">Crear mi cuenta <span aria-hidden="true">→</span></button></div>
+        </form>
+        <p class="form-footnote">¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+    </section>
+</main>
+
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>

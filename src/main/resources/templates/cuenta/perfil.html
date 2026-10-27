@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Mi cuenta')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap page-wrap-narrow">
+    <header class="page-heading">
+        <p class="eyebrow">Perfil personal</p>
+        <h1>Mis datos</h1>
+        <p>Actualiza la información de tu cuenta. Tu rol y el estado de acceso se administran por separado.</p>
+    </header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <section class="form-card">
+        <div class="account-summary">
+            <span class="avatar" aria-hidden="true">◎</span>
+            <div><strong>Información personal</strong><span>Los cambios se guardarán en tu cuenta.</span></div>
+        </div>
+        <form th:action="@{/cuenta}" th:object="${cuenta}" method="post">
+            <div class="form-grid">
+                <div class="field field-full">
+                    <label for="identificacion">Identificación</label>
+                    <input id="identificacion" type="text" th:field="*{identificacion}" required maxlength="45" autocomplete="off">
+                    <small class="field-error" th:if="${#fields.hasErrors('identificacion')}" th:errors="*{identificacion}"></small>
+                </div>
+                <div class="field field-full">
+                    <label for="nombre">Nombre completo</label>
+                    <input id="nombre" type="text" th:field="*{nombre}" required maxlength="45" autocomplete="name">
+                    <small class="field-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+                <div class="field">
+                    <label for="telefono">Teléfono</label>
+                    <input id="telefono" type="tel" th:field="*{telefono}" required maxlength="45" autocomplete="tel">
+                    <small class="field-error" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></small>
+                </div>
+                <div class="field">
+                    <label for="correo">Correo electrónico</label>
+                    <input id="correo" type="email" th:field="*{correo}" required maxlength="254" autocomplete="email">
+                    <small class="field-error" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">Guardar cambios <span aria-hidden="true">→</span></button>
+                <a class="button button-secondary" th:href="@{/}">Volver al inicio</a>
+            </div>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
