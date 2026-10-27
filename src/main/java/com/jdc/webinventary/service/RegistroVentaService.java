@@ -8,6 +8,7 @@ import com.jdc.webinventary.repository.ProductosRepository;
 import com.jdc.webinventary.repository.VentasRepository;
 import com.jdc.webinventary.repository.UsuariosRepository;
 import com.jdc.webinventary.repository.MovimientosInventariosRepository;
+import com.jdc.webinventary.repository.ComprasRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
@@ -26,6 +27,7 @@ public class RegistroVentaService {
     private final MovimientosInventariosRepository movimientosRepository;
     private final EstadoAlertaInventarioService estadoAlertas;
     private final EntityManager entityManager;
+    private final ComprasRepository comprasRepository;
 
     public RegistroVentaService(ClientesRepository clientesRepository,
                                 ProductosRepository productosRepository,
@@ -33,7 +35,8 @@ public class RegistroVentaService {
                                 UsuariosRepository usuariosRepository,
                                 MovimientosInventariosRepository movimientosRepository,
                                 EstadoAlertaInventarioService estadoAlertas,
-                                EntityManager entityManager) {
+                                EntityManager entityManager,
+                                ComprasRepository comprasRepository) {
         this.clientesRepository = clientesRepository;
         this.productosRepository = productosRepository;
         this.ventasRepository = ventasRepository;
@@ -41,6 +44,7 @@ public class RegistroVentaService {
         this.movimientosRepository = movimientosRepository;
         this.estadoAlertas = estadoAlertas;
         this.entityManager = entityManager;
+        this.comprasRepository = comprasRepository;
     }
 
     @Transactional
@@ -106,7 +110,8 @@ public class RegistroVentaService {
 
             DetalleVentasEntity detalle = new DetalleVentasEntity(
                     null, item.getCantidad(), precio,
-                    item.getCostoUnitarioHistorico(), item.getMedioPago(), venta, producto);
+                    usarPrecioCatalogo ? comprasRepository.costoUnitarioMasReciente(producto.getIdProducto(), venta.getFecha())
+                            : item.getCostoUnitarioHistorico(), item.getMedioPago(), venta, producto);
             venta.addDetalle(detalle);
         }
 
