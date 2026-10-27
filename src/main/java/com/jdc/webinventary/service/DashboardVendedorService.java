@@ -25,11 +25,10 @@ public class DashboardVendedorService {
         if (usuarioId == null || desde == null || hasta == null || desde.isAfter(hasta)) {
             throw new IllegalArgumentException("El período seleccionado no es válido.");
         }
-        List<VentasEntity> ventasPropias = ventasRepository.findByVendedor_IdUsuarioOrderByFechaDesc(usuarioId)
-                .stream().filter(v -> dentro(v.getFecha(), desde, hasta)).toList();
+        List<VentasEntity> ventasPropias = ventasRepository
+                .findByVendedor_IdUsuarioAndFechaBetweenOrderByFechaDesc(usuarioId, desde, hasta);
         List<InversionesEntity> aportesPropios = inversionesRepository
-                .findByUsuario_IdUsuarioOrderByFechaDesc(usuarioId).stream()
-                .filter(a -> dentro(a.getFecha(), desde, hasta)).toList();
+                .findByUsuario_IdUsuarioAndFechaBetweenOrderByFechaDesc(usuarioId, desde, hasta);
 
         Map<YearMonth, long[]> meses = new TreeMap<>();
         for (YearMonth mes = YearMonth.from(desde); !mes.isAfter(YearMonth.from(hasta)); mes = mes.plusMonths(1)) {
@@ -40,6 +39,7 @@ public class DashboardVendedorService {
         long aportesConfirmados = 0;
         Map<String, Long> cantidadesProducto = new HashMap<>();
         List<MovimientoPersonal> historial = new ArrayList<>();
+        List<VentaPersonal> detalleVentas = new ArrayList<>();
 
         for (VentasEntity venta : ventasPropias) {
             long totalVenta = totalVenta(venta);
@@ -57,6 +57,9 @@ public class DashboardVendedorService {
             }
             historial.add(new MovimientoPersonal("Venta #" + venta.getIdVenta(), venta.getFecha(), totalVenta,
                     confirmada ? "CONFIRMADA" : textoEstado(venta.getEstado())));
+            String cliente = venta.getCliente() == null ? "Sin cliente" : venta.getCliente().getNombre();
+            detalleVentas.add(new VentaPersonal(venta.getIdVenta(), venta.getFecha(), cliente, totalVenta,
+                    venta.getDetalles().size(), confirmada ? "CONFIRMADA" : textoEstado(venta.getEstado())));
         }
 
         for (InversionesEntity aporte : aportesPropios) {
@@ -82,11 +85,7 @@ public class DashboardVendedorService {
         return new Resumen(desde, hasta, aportesConfirmados, totalVentas,
                 (int) ventasPropias.stream().filter(v -> v.getEstado() == null || v.getEstado() == 1).count(),
                 (int) aportesPropios.stream().filter(a -> a.getEstado() != null && a.getEstado() == 1).count(),
-                productos, evolucion, historial);
-    }
-
-    private boolean dentro(LocalDate fecha, LocalDate desde, LocalDate hasta) {
-        return fecha != null && !fecha.isBefore(desde) && !fecha.isAfter(hasta);
+                productos, evolucion, detalleVentas, historial);
     }
 
     private long totalVenta(VentasEntity venta) {
@@ -112,8 +111,10 @@ public class DashboardVendedorService {
     public record ProductoVendido(String nombre, long unidades) { }
     public record EvolucionMensual(String mes, long ventas, long aportesConfirmados) { }
     public record MovimientoPersonal(String concepto, LocalDate fecha, long monto, String estado) { }
+    public record VentaPersonal(Integer numero, LocalDate fecha, String cliente, long total,
+                                int cantidadProductos, String estado) { }
     public record Resumen(LocalDate desde, LocalDate hasta, long aportesConfirmados, long ventas,
                           int cantidadVentas, int cantidadAportesConfirmados,
                           List<ProductoVendido> productosVendidos, List<EvolucionMensual> evolucionMensual,
-                          List<MovimientoPersonal> historial) { }
+                          List<VentaPersonal> detalleVentas, List<MovimientoPersonal> historial) { }
 }
