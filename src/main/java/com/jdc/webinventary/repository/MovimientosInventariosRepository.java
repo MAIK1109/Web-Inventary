@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface MovimientosInventariosRepository extends JpaRepository<MovimientosInventariosEntity, Integer> {
+    boolean existsByProducto_IdProducto(Integer productoId);
+
     @EntityGraph(attributePaths = {"producto", "usuario"})
     List<MovimientosInventariosEntity> findAllByOrderByFechaDesc();
 

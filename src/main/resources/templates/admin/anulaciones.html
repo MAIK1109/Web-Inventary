@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Anulaciones y trazabilidad')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Control administrativo</p><h1>Anulaciones</h1>
+        <p>Las operaciones confirmadas se revierten mediante movimientos registrados y conservan su historial. Consulta el número en Compras, Ventas, Gastos o Aportes.</p></header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
+    <section class="form-card">
+        <h2>Anular una operación confirmada</h2>
+        <form id="anulacion-form" th:action="@{/admin/anulaciones}" method="post" class="form-grid">
+            <div class="field"><label for="tipo">Tipo</label><select id="tipo" required>
+                <option value="">Selecciona</option><option value="VENTA">Venta</option><option value="COMPRA">Compra</option>
+                <option value="GASTO">Gasto</option><option value="APORTE">Aporte aprobado</option></select></div>
+            <div class="field"><label for="operacionId">Número de operación</label><input id="operacionId" type="number" min="1" required></div>
+            <div class="field" style="grid-column:1/-1"><label for="motivo">Motivo</label><input id="motivo" name="motivo" maxlength="250" required></div>
+            <div class="form-actions"><button class="button button-primary" type="submit">Registrar anulación</button></div>
+        </form>
+    </section>
+    <section class="table-card" style="margin-top:20px">
+        <div class="table-top"><div><h2>Historial de anulaciones</h2><p>Registro inalterable del responsable, la fecha y el motivo.</p></div></div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Operación</th><th>Número</th><th>Motivo</th><th>Responsable</th></tr></thead>
+            <tbody><tr th:each="item : ${anulaciones}"><td th:text="${item.fechaAnulacion}"></td><td th:text="${item.tipoOperacion}"></td>
+                <td th:text="${item.operacionId}"></td><td th:text="${item.motivo}"></td><td th:text="${item.usuario.nombre}"></td></tr>
+                <tr th:if="${#lists.isEmpty(anulaciones)}"><td class="empty-state" colspan="5">Todavía no se han registrado anulaciones.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<script>
+    document.getElementById('anulacion-form').addEventListener('submit', function () {
+        this.action = `/admin/anulaciones/${encodeURIComponent(document.getElementById('tipo').value)}/${encodeURIComponent(document.getElementById('operacionId').value)}`;
+    });
+</script>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>

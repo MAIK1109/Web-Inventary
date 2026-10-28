@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CambioAlertaInventarioRepository extends JpaRepository<CambioAlertaInventarioEntity, Integer> {
+    boolean existsByProducto_IdProducto(Integer productoId);
+
     @EntityGraph(attributePaths = "producto")
     @Query("select c from CambioAlertaInventarioEntity c order by c.fecha desc, c.id desc")
     List<CambioAlertaInventarioEntity> findRecientes(Pageable pageable);
