@@ -22,12 +22,14 @@ public class AportesService {
     private final InversionesRepository inversiones;
     private final UsuariosRepository usuarios;
     private final AporteSoporteStorageService soporteStorage;
+    private final CorreoEventosService correoEventos;
 
     public AportesService(InversionesRepository inversiones, UsuariosRepository usuarios,
-                          AporteSoporteStorageService soporteStorage) {
+                          AporteSoporteStorageService soporteStorage, CorreoEventosService correoEventos) {
         this.inversiones = inversiones;
         this.usuarios = usuarios;
         this.soporteStorage = soporteStorage;
+        this.correoEventos = correoEventos;
     }
 
     public List<InversionesEntity> listarPendientes() {
@@ -71,6 +73,7 @@ public class AportesService {
                     PENDIENTE, null, usuario);
             aporte.setSoporteArchivo(archivo);
             inversiones.saveAndFlush(aporte);
+            correoEventos.avisarNuevoAporte(aporte);
         } catch (RuntimeException ex) {
             soporteStorage.eliminar(archivo);
             throw ex;
@@ -104,11 +107,14 @@ public class AportesService {
 
     @Transactional
     public void decidir(Integer id, boolean aprobar, String superadmin) {
+        InversionesEntity aporte = inversiones.findByIdWithUsuario(id)
+                .orElseThrow(() -> new AporteNoEncontradoException("El aporte no existe o ya fue revisado."));
         int actualizados = inversiones.decidirSiPendiente(id, PENDIENTE,
                 aprobar ? APROBADO : RECHAZADO, aprobar ? superadmin : null);
         if (actualizados == 0) {
             throw new AporteNoEncontradoException("El aporte no existe o ya fue revisado.");
         }
+        correoEventos.avisarResultadoAporte(aporte, aprobar);
     }
 
     public static class AporteNoEncontradoException extends RuntimeException {

@@ -9,9 +9,13 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface InversionesRepository extends JpaRepository<InversionesEntity, Integer> {
+    @Query("select i from InversionesEntity i join fetch i.usuario where i.idInversion = :id")
+    Optional<InversionesEntity> findByIdWithUsuario(@Param("id") Integer id);
+
     @org.springframework.data.jpa.repository.EntityGraph(attributePaths = "usuario")
     List<InversionesEntity> findAllByOrderByFechaDesc();
     List<InversionesEntity> findByUsuario_IdUsuarioOrderByFechaDesc(Integer usuarioId);
