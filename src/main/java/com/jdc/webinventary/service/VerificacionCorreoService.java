@@ -30,15 +30,18 @@ public class VerificacionCorreoService {
     private final TokenVerificacionRepository tokens;
     private final ObjectProvider<JavaMailSender> mailSender;
     private final String baseUrl;
+    private final String remitente;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public VerificacionCorreoService(UsuariosRepository usuarios, TokenVerificacionRepository tokens,
                                      ObjectProvider<JavaMailSender> mailSender,
-                                     @Value("${app.security.email-verification-base-url:http://localhost:8086}") String baseUrl) {
+                                     @Value("${app.security.email-verification-base-url:http://localhost:8086}") String baseUrl,
+                                     @Value("${spring.mail.username:}") String remitente) {
         this.usuarios = usuarios;
         this.tokens = tokens;
         this.mailSender = mailSender;
         this.baseUrl = baseUrl.replaceAll("/$", "");
+        this.remitente = remitente;
     }
 
     @Transactional
@@ -56,6 +59,7 @@ public class VerificacionCorreoService {
             return;
         }
         SimpleMailMessage message = new SimpleMailMessage();
+        if (!remitente.isBlank()) message.setFrom(remitente);
         message.setTo(usuario.getCorreo());
         message.setSubject("Verifica tu correo para Web Inventary");
         message.setText("Hola " + usuario.getNombre() + ",\n\n" +

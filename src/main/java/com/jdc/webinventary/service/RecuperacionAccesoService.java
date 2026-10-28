@@ -32,16 +32,19 @@ public class RecuperacionAccesoService {
     private final PasswordEncoder passwordEncoder;
     private final ObjectProvider<JavaMailSender> mailSender;
     private final String baseUrl;
+    private final String remitente;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public RecuperacionAccesoService(UsuariosRepository usuarios, TokenRecuperacionRepository tokens,
                                      PasswordEncoder passwordEncoder, ObjectProvider<JavaMailSender> mailSender,
-                                     @Value("${PASSWORD_RESET_BASE_URL:http://localhost:8086}") String baseUrl) {
+                                     @Value("${app.security.password-reset-base-url:http://localhost:8086}") String baseUrl,
+                                     @Value("${spring.mail.username:}") String remitente) {
         this.usuarios = usuarios;
         this.tokens = tokens;
         this.passwordEncoder = passwordEncoder;
         this.mailSender = mailSender;
         this.baseUrl = baseUrl.replaceAll("/$", "");
+        this.remitente = remitente;
     }
 
     @Transactional
@@ -66,6 +69,7 @@ public class RecuperacionAccesoService {
             return;
         }
         SimpleMailMessage message = new SimpleMailMessage();
+        if (!remitente.isBlank()) message.setFrom(remitente);
         message.setTo(correo);
         message.setSubject("Recuperación de acceso a Web Inventary");
         message.setText("Hola " + usuario.getNombre() + ",\n\n" +

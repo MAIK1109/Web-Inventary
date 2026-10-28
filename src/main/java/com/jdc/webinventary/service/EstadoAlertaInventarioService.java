@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 public class EstadoAlertaInventarioService {
     private final EstadoAlertaInventarioRepository estados;
     private final CambioAlertaInventarioRepository cambios;
+    private final CorreoEventosService correoEventos;
 
     public EstadoAlertaInventarioService(EstadoAlertaInventarioRepository estados,
-                                         CambioAlertaInventarioRepository cambios) {
+                                         CambioAlertaInventarioRepository cambios,
+                                         CorreoEventosService correoEventos) {
         this.estados = estados;
         this.cambios = cambios;
+        this.correoEventos = correoEventos;
     }
 
     @Transactional
@@ -28,10 +31,12 @@ public class EstadoAlertaInventarioService {
         EstadoAlertaInventarioEntity estado = estados.findByProducto_IdProducto(producto.getIdProducto()).orElse(null);
         if (estado == null) {
             estados.save(new EstadoAlertaInventarioEntity(producto, nuevoEstado, ahora));
+            correoEventos.avisarAlertaStock(producto, nuevoEstado);
         } else if (!nuevoEstado.equals(estado.getEstado())) {
             cambios.save(new CambioAlertaInventarioEntity(producto, estado.getEstado(), nuevoEstado, ahora));
             estado.setEstado(nuevoEstado);
             estado.setActualizadoEn(ahora);
+            correoEventos.avisarAlertaStock(producto, nuevoEstado);
         }
     }
 
