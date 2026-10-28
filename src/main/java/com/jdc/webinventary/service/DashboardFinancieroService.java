@@ -5,6 +5,8 @@ import com.jdc.webinventary.entity.*;
 import com.jdc.webinventary.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -17,13 +19,16 @@ public class DashboardFinancieroService {
     private final ComprasRepository compras;
     private final GastosRepository gastos;
     private final UsuariosRepository usuarios;
+    private final GastoComprobanteStorageService comprobantes;
 
     public DashboardFinancieroService(VentasRepository ventas, ComprasRepository compras,
-                                      GastosRepository gastos, UsuariosRepository usuarios) {
+                                      GastosRepository gastos, UsuariosRepository usuarios,
+                                      GastoComprobanteStorageService comprobantes) {
         this.ventas = ventas;
         this.compras = compras;
         this.gastos = gastos;
         this.usuarios = usuarios;
+        this.comprobantes = comprobantes;
     }
 
     @Transactional(readOnly = true)
@@ -96,13 +101,33 @@ public class DashboardFinancieroService {
     @Transactional
     public void registrarGasto(RegistroGastoForm form, Integer usuarioId) {
         if (form.getMonto() == null || form.getMonto() <= 0 || form.getFecha() == null
-                || form.getConcepto() == null || form.getConcepto().isBlank()) {
-            throw new IllegalArgumentException("Completa el monto, la fecha y el concepto del gasto.");
+                || form.getConcepto() == null || form.getConcepto().isBlank()
+                || form.getCategoria() == null || form.getCategoria().isBlank()) {
+            throw new IllegalArgumentException("Completa el monto, la fecha, la categoría y el concepto del gasto.");
         }
         UsuariosEntity usuario = usuarios.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
-        gastos.save(new GastosEntity(form.getMonto(), form.getFecha(), form.getConcepto().trim(),
-                form.getCategoria() == null || form.getCategoria().isBlank() ? null : form.getCategoria().trim(), usuario));
+        String comprobante = comprobantes.guardar(form.getComprobante());
+        try {
+            GastosEntity gasto = new GastosEntity(form.getMonto(), form.getFecha(), form.getConcepto().trim(),
+                    form.getCategoria().trim(), usuario);
+            gasto.setComprobanteArchivo(comprobante);
+            gastos.saveAndFlush(gasto);
+        } catch (RuntimeException ex) {
+            comprobantes.eliminar(comprobante);
+            throw ex;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Resource comprobanteParaDescarga(Integer gastoId) {
+        GastosEntity gasto = gastos.findById(gastoId).orElseThrow(GastoNoEncontradoException::new);
+        if (gasto.getComprobanteArchivo() == null) throw new GastoNoEncontradoException();
+        try {
+            return comprobantes.cargar(gasto.getComprobanteArchivo());
+        } catch (GastoComprobanteStorageService.ComprobanteNoEncontradoException ex) {
+            throw new GastoNoEncontradoException();
+        }
     }
 
     private Map<Integer, List<CostoFecha>> indexarCostos(List<ComprasEntity> comprasConfirmadas) {
@@ -129,6 +154,7 @@ public class DashboardFinancieroService {
     }
 
     private record CostoFecha(LocalDate fecha, Integer compraId, Integer detalleId, Integer costo) { }
+    public static class GastoNoEncontradoException extends RuntimeException { }
     public record EvolucionMensual(String mes, long ventasNetas, long costoMercancia,
                                    long gastos, long utilidadNeta) { }
     public record Resumen(LocalDate desde, LocalDate hasta, long ventasNetas,

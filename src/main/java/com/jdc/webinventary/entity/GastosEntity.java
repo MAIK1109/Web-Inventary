@@ -23,6 +23,9 @@ public class GastosEntity {
     @Column(name = "categoria", length = 45)
     private String categoria;
 
+    @Column(name = "comprobante_archivo", length = 100)
+    private String comprobanteArchivo;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_idusuario", nullable = false)
     private UsuariosEntity usuario;
@@ -42,5 +45,7 @@ public class GastosEntity {
     public LocalDate getFecha() { return fecha; }
     public String getConcepto() { return concepto; }
     public String getCategoria() { return categoria; }
+    public String getComprobanteArchivo() { return comprobanteArchivo; }
+    public void setComprobanteArchivo(String comprobanteArchivo) { this.comprobanteArchivo = comprobanteArchivo; }
     public UsuariosEntity getUsuario() { return usuario; }
 }

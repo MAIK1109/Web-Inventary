@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -21,8 +22,11 @@ public class RegistroGastoForm {
     @Size(max = 120, message = "El concepto no puede superar 120 caracteres")
     private String concepto;
 
+    @NotBlank(message = "La categoría es obligatoria")
     @Size(max = 45, message = "La categoría no puede superar 45 caracteres")
     private String categoria;
+
+    private MultipartFile comprobante;
 
     public Integer getMonto() { return monto; }
     public void setMonto(Integer monto) { this.monto = monto; }
@@ -32,4 +36,6 @@ public class RegistroGastoForm {
     public void setConcepto(String concepto) { this.concepto = concepto; }
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
+    public MultipartFile getComprobante() { return comprobante; }
+    public void setComprobante(MultipartFile comprobante) { this.comprobante = comprobante; }
 }

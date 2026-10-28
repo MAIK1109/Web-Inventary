@@ -4,6 +4,11 @@ import com.jdc.webinventary.dto.RegistroGastoForm;
 import com.jdc.webinventary.security.CuentaUserDetails;
 import com.jdc.webinventary.service.DashboardFinancieroService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -61,6 +67,21 @@ public class DashboardFinancieroController {
         redirect.addAttribute("desde", desde);
         redirect.addAttribute("hasta", hasta);
         return "redirect:/dashboard/financiero";
+    }
+
+    @GetMapping("/dashboard/financiero/gastos/{id}/comprobante")
+    public ResponseEntity<Resource> descargarComprobante(@PathVariable Integer id) {
+        try {
+            Resource archivo = dashboard.comprobanteParaDescarga(id);
+            String archivoOriginal = archivo.getFilename();
+            String extension = archivoOriginal != null && archivoOriginal.lastIndexOf('.') >= 0
+                    ? archivoOriginal.substring(archivoOriginal.lastIndexOf('.')) : "";
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                            .filename("comprobante-gasto-" + id + extension).build().toString()).body(archivo);
+        } catch (DashboardFinancieroService.GastoNoEncontradoException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private void cargar(Model model, LocalDate desde, LocalDate hasta) {

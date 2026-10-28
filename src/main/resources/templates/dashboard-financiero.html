@@ -35,22 +35,27 @@
     </section>
     <section class="table-card" style="margin-top:20px">
         <div class="table-top"><div><h2>Registrar gasto</h2><p>Los gastos se incluyen en la utilidad neta estimada según su fecha.</p></div></div>
-        <form th:action="@{/dashboard/financiero/gastos}" th:object="${gasto}" method="post" class="form-grid">
+        <form th:action="@{/dashboard/financiero/gastos}" th:object="${gasto}" method="post" enctype="multipart/form-data" class="form-grid">
             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
             <input type="hidden" name="desde" th:value="${desde}"><input type="hidden" name="hasta" th:value="${hasta}">
-            <div class="field"><label for="monto">Monto</label><input id="monto" type="number" min="1" step="1" th:field="*{monto}" required><small class="field-error" th:errors="*{monto}"></small></div>
+            <div class="field"><label for="monto">Valor</label><input id="monto" type="number" min="1" step="1" th:field="*{monto}" required><small class="field-error" th:errors="*{monto}"></small></div>
             <div class="field"><label for="fecha">Fecha</label><input id="fecha" type="date" th:field="*{fecha}" required><small class="field-error" th:errors="*{fecha}"></small></div>
             <div class="field"><label for="concepto">Concepto</label><input id="concepto" type="text" maxlength="120" th:field="*{concepto}" required><small class="field-error" th:errors="*{concepto}"></small></div>
-            <div class="field"><label for="categoria">Categoría</label><input id="categoria" type="text" maxlength="45" th:field="*{categoria}" placeholder="Arriendo, servicios, transporte"><small class="field-error" th:errors="*{categoria}"></small></div>
+            <div class="field"><label for="categoria">Categoría</label><input id="categoria" type="text" maxlength="45" th:field="*{categoria}" placeholder="Arriendo, servicios, transporte" required><small class="field-error" th:errors="*{categoria}"></small></div>
+            <div class="field"><label for="comprobante">Comprobante <span class="field-hint">Opcional · PDF, PNG o JPG, máximo 5 MB</span></label>
+                <input id="comprobante" type="file" th:field="*{comprobante}" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
+                <small class="field-error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></small></div>
             <div class="form-actions"><button class="button button-primary" type="submit">Guardar gasto</button></div>
         </form>
     </section>
     <section class="table-card" style="margin-top:20px">
         <div class="table-top"><div><h2>Gastos del período</h2><p>Registro de egresos incluidos en el cálculo.</p></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Registrado por</th></tr></thead>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Comprobante</th><th>Registrado por</th></tr></thead>
             <tbody><tr th:each="gastoItem : ${resumen.gastosDetalle}"><td th:text="${gastoItem.fecha}"></td><td th:text="${gastoItem.concepto}"></td>
-                <td th:text="${gastoItem.categoria == null ? '—' : gastoItem.categoria}"></td><td th:text="${gastoItem.monto}"></td><td th:text="${gastoItem.usuario.nombre}"></td></tr>
-                <tr th:if="${#lists.isEmpty(resumen.gastosDetalle)}"><td class="empty-state" colspan="5">No hay gastos registrados en este período.</td></tr></tbody>
+                <td th:text="${gastoItem.categoria == null ? '—' : gastoItem.categoria}"></td><td th:text="${gastoItem.monto}"></td>
+                <td><a th:if="${gastoItem.comprobanteArchivo != null}" th:href="@{/dashboard/financiero/gastos/{id}/comprobante(id=${gastoItem.idGasto})}">Descargar</a><span th:if="${gastoItem.comprobanteArchivo == null}">—</span></td>
+                <td th:text="${gastoItem.usuario.nombre}"></td></tr>
+                <tr th:if="${#lists.isEmpty(resumen.gastosDetalle)}"><td class="empty-state" colspan="6">No hay gastos registrados en este período.</td></tr></tbody>
         </table></div>
     </section>
     <p class="field-hint" style="margin-top:16px">Los importes usan las unidades monetarias del sistema. “Ventas netas” representa ventas confirmadas; descuentos, devoluciones e impuestos no se restan porque no están registrados en el modelo. El margen es neto estimado.</p>
