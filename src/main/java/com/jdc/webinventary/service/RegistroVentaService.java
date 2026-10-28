@@ -89,6 +89,9 @@ public class RegistroVentaService {
 
             ProductosEntity producto = productosRepository.findByIdForUpdate(item.getProductoId())
                     .orElseThrow(() -> new IllegalArgumentException("El producto no existe."));
+            if (producto.getEstado() != null && producto.getEstado() != 1) {
+                throw new IllegalArgumentException("El producto " + producto.getNombre() + " está inactivo.");
+            }
             if (producto.getStockActual() == null || producto.getStockActual() < item.getCantidad()) {
                 throw new StockInsuficienteException(producto.getNombre());
             }

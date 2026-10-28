@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "productos", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_productos_codigo", columnNames = "codigo")
+})
 public class ProductosEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -16,11 +18,17 @@ public class ProductosEntity implements Serializable {
     @Column(name = "idproducto")
     private Integer idProducto;
 
-    @Column(name = "codigo", length = 45)
+    @Column(name = "codigo", length = 45, nullable = false)
     private String codigo;
 
-    @Column(name = "nombre", length = 45)
+    @Column(name = "nombre", length = 45, nullable = false)
     private String nombre;
+
+    @Column(name = "descripcion", length = 500)
+    private String descripcion;
+
+    @Column(name = "precio_compra_referencia")
+    private Integer precioCompraReferencia;
 
     @Column(name = "precio_venta")
     private Integer precioVenta;
@@ -86,6 +94,16 @@ public class ProductosEntity implements Serializable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getDescripcion() { return descripcion; }
+
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public Integer getPrecioCompraReferencia() { return precioCompraReferencia; }
+
+    public void setPrecioCompraReferencia(Integer precioCompraReferencia) {
+        this.precioCompraReferencia = precioCompraReferencia;
     }
 
     public Integer getPrecioVenta() {

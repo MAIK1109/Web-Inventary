@@ -59,7 +59,7 @@ public class ComprasController {
 
     private void preparar(Model model) {
         model.addAttribute("proveedores", proveedores.findAll(Sort.by("nombre").ascending()));
-        model.addAttribute("productos", productos.findAll(Sort.by("nombre").ascending()));
+        model.addAttribute("productos", productos.findByEstadoIsNullOrEstado((byte) 1, Sort.by("nombre").ascending()));
         model.addAttribute("compras", registroCompra.listar());
     }
 }

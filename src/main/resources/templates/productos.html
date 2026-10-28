@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Productos')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading">
+        <p class="eyebrow">Catálogo e inventario</p>
+        <h1>Productos</h1>
+        <p>Registra y consulta el catálogo, actualiza precios y controla qué productos están disponibles.</p>
+    </header>
+    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+
+    <section class="form-card">
+        <h2 th:text="${productoId == null ? 'Crear producto' : 'Editar producto'}">Crear producto</h2>
+        <form th:action="${formAction}" th:object="${producto}" method="post">
+            <div class="form-grid">
+                <div class="field">
+                    <label for="codigo">Código único</label>
+                    <input id="codigo" type="text" th:field="*{codigo}" maxlength="45" required autocomplete="off" placeholder="Ej. PROD-001">
+                    <small class="field-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></small>
+                </div>
+                <div class="field">
+                    <label for="nombre">Nombre</label>
+                    <input id="nombre" type="text" th:field="*{nombre}" maxlength="45" required placeholder="Nombre del producto">
+                    <small class="field-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></small>
+                </div>
+                <div class="field">
+                    <label for="categoriaProducto">Categoría</label>
+                    <input id="categoriaProducto" type="text" th:field="*{categoriaProducto}" maxlength="45" required placeholder="Ej. Aseo">
+                    <small class="field-error" th:if="${#fields.hasErrors('categoriaProducto')}" th:errors="*{categoriaProducto}"></small>
+                </div>
+                <div class="field field-full">
+                    <label for="descripcion">Descripción <span class="field-hint">Opcional</span></label>
+                    <textarea id="descripcion" th:field="*{descripcion}" maxlength="500" rows="3" placeholder="Detalles del producto"></textarea>
+                    <small class="field-error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></small>
+                </div>
+                <div class="field">
+                    <label for="precioCompraReferencia">Precio de compra de referencia</label>
+                    <input id="precioCompraReferencia" type="number" th:field="*{precioCompraReferencia}" min="0" step="1" required>
+                    <small class="field-error" th:if="${#fields.hasErrors('precioCompraReferencia')}" th:errors="*{precioCompraReferencia}"></small>
+                </div>
+                <div class="field">
+                    <label for="precioVenta">Precio de venta</label>
+                    <input id="precioVenta" type="number" th:field="*{precioVenta}" min="0" step="1" required>
+                    <small class="field-error" th:if="${#fields.hasErrors('precioVenta')}" th:errors="*{precioVenta}"></small>
+                </div>
+                <div class="field">
+                    <label for="stockMinimo">Stock mínimo</label>
+                    <input id="stockMinimo" type="number" th:field="*{stockMinimo}" min="0" step="1" required>
+                    <small class="field-error" th:if="${#fields.hasErrors('stockMinimo')}" th:errors="*{stockMinimo}"></small>
+                </div>
+                <div class="field">
+                    <label for="estado">Estado</label>
+                    <select id="estado" th:field="*{estado}" required>
+                        <option value="1">Activo</option>
+                        <option value="0">Inactivo</option>
+                    </select>
+                    <small class="field-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></small>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="button button-primary" type="submit" th:text="${productoId == null ? 'Guardar producto' : 'Guardar cambios'}">Guardar producto</button>
+                <a th:if="${productoId != null}" class="button button-secondary" th:href="@{/productos}">Cancelar</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="table-card" style="margin-top: 20px">
+        <div class="table-top"><div><h2>Catálogo</h2><p th:text="|${#lists.size(productos)} productos registrados|"></p></div></div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Compra ref.</th><th>Venta</th><th>Stock</th><th>Estado</th><th>Acción</th></tr></thead>
+                <tbody>
+                <tr th:each="item : ${productos}">
+                    <td th:text="${item.codigo}"></td>
+                    <td><strong th:text="${item.nombre}"></strong><small class="table-subtext" th:text="${item.descripcion}"></small></td>
+                    <td th:text="${item.categoriaProducto}"></td>
+                    <td th:text="${item.precioCompraReferencia == null ? '—' : '$ ' + item.precioCompraReferencia}"></td>
+                    <td th:text="${item.precioVenta == null ? '—' : '$ ' + item.precioVenta}"></td>
+                    <td th:text="|${item.stockActual == null ? 0 : item.stockActual} / mín. ${item.stockMinimo == null ? 0 : item.stockMinimo}|"></td>
+                    <td><span class="status-pill" th:classappend="${item.estado == null or item.estado == 1 ? 'status-active' : 'status-blocked'}"
+                              th:text="${item.estado == null or item.estado == 1 ? 'ACTIVO' : 'INACTIVO'}"></span></td>
+                    <td><a class="button button-secondary button-small" th:href="@{/productos/{id}/editar(id=${item.idProducto})}">Editar</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(productos)}"><td class="empty-state" colspan="8">Aún no hay productos registrados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>

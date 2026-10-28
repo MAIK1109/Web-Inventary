@@ -65,7 +65,7 @@ public class VentasController {
 
     private void preparar(Model model) {
         model.addAttribute("clientes", clientes.findAll(Sort.by("nombre").ascending()));
-        model.addAttribute("productos", productos.findAll(Sort.by("nombre").ascending()));
+        model.addAttribute("productos", productos.findByEstadoIsNullOrEstado((byte) 1, Sort.by("nombre").ascending()));
         var ventasRegistradas = registroVenta.listar();
         Map<Integer, Long> totales = new LinkedHashMap<>();
         for (VentasEntity venta : ventasRegistradas) {

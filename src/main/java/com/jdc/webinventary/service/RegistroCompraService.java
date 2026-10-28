@@ -55,6 +55,9 @@ public class RegistroCompraService {
             }
             ProductosEntity producto = productos.findByIdForUpdate(item.getProductoId())
                     .orElseThrow(() -> new IllegalArgumentException("Uno de los productos seleccionados no existe."));
+            if (producto.getEstado() != null && producto.getEstado() != 1) {
+                throw new IllegalArgumentException("El producto " + producto.getNombre() + " está inactivo.");
+            }
             long stockNuevo = (long) (producto.getStockActual() == null ? 0 : producto.getStockActual()) + item.getCantidad();
             if (stockNuevo > Integer.MAX_VALUE) {
                 throw new IllegalArgumentException("La cantidad supera el stock máximo permitido para " + producto.getNombre() + ".");

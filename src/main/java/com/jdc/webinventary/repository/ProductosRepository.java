@@ -8,10 +8,18 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductosRepository extends JpaRepository<ProductosEntity, Integer>, JpaSpecificationExecutor<ProductosEntity> {
+
+    boolean existsByCodigoIgnoreCase(String codigo);
+
+    boolean existsByCodigoIgnoreCaseAndIdProductoNot(String codigo, Integer idProducto);
+
+    List<ProductosEntity> findByEstadoIsNullOrEstado(Byte estado, Sort sort);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from ProductosEntity p where p.idProducto = :id")
