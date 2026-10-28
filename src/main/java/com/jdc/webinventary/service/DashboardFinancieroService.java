@@ -79,6 +79,7 @@ public class DashboardFinancieroService {
             filaMes[1] = Math.addExact(filaMes[1], costoVenta);
         }
         for (GastosEntity gasto : gastosPeriodo) {
+            if (gasto.getEstado() != null && gasto.getEstado() != CONFIRMADA) continue;
             gastosTotales = Math.addExact(gastosTotales, gasto.getMonto());
             long[] filaMes = meses.get(YearMonth.from(gasto.getFecha()));
             filaMes[2] = Math.addExact(filaMes[2], gasto.getMonto());

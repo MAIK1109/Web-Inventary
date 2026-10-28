@@ -10,6 +10,7 @@
         <p>Registra y consulta el catálogo, actualiza precios y controla qué productos están disponibles.</p>
     </header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
 
     <section class="form-card">
         <h2 th:text="${productoId == null ? 'Crear producto' : 'Editar producto'}">Crear producto</h2>
@@ -81,7 +82,9 @@
                     <td th:text="|${item.stockActual == null ? 0 : item.stockActual} / mín. ${item.stockMinimo == null ? 0 : item.stockMinimo}|"></td>
                     <td><span class="status-pill" th:classappend="${item.estado == null or item.estado == 1 ? 'status-active' : 'status-blocked'}"
                               th:text="${item.estado == null or item.estado == 1 ? 'ACTIVO' : 'INACTIVO'}"></span></td>
-                    <td><a class="button button-secondary button-small" th:href="@{/productos/{id}/editar(id=${item.idProducto})}">Editar</a></td>
+                    <td><div class="table-actions"><a class="button button-secondary button-small" th:href="@{/productos/{id}/editar(id=${item.idProducto})}">Editar</a>
+                        <form th:if="${isSuperadmin}" th:action="@{/admin/eliminaciones/PRODUCTO/{id}(id=${item.idProducto})}" method="post" onsubmit="return confirm('¿Eliminar este producto si no tiene dependencias?')">
+                            <button class="button button-danger button-small" type="submit">Eliminar</button></form></div></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(productos)}"><td class="empty-state" colspan="8">Aún no hay productos registrados.</td></tr>
                 </tbody>

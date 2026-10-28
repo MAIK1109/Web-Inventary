@@ -7,6 +7,7 @@
     <header class="page-heading"><p class="eyebrow">Directorio comercial</p><h1>Proveedores</h1>
         <p>Registra y consulta la información de contacto de tus proveedores.</p></header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
     <section class="form-card">
         <h2>Registrar proveedor</h2>
         <form th:action="@{/proveedores}" th:object="${proveedor}" method="post">
@@ -32,9 +33,10 @@
     </section>
     <section class="table-card" style="margin-top: 20px">
         <div class="table-top"><div><h2>Proveedores registrados</h2><p th:text="|${#lists.size(proveedores)} proveedores|"></p></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Identificación</th><th>Razón social</th><th>Teléfono</th><th>Correo</th><th>Dirección</th></tr></thead>
-            <tbody><tr th:each="item : ${proveedores}"><td th:text="${item.identificacion}"></td><td th:text="${item.nombre}"></td><td th:text="${item.telefono}"></td><td th:text="${item.correo}"></td><td th:text="${item.direccion}"></td></tr>
-                <tr th:if="${#lists.isEmpty(proveedores)}"><td class="empty-state" colspan="5">Aún no hay proveedores registrados.</td></tr></tbody>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Identificación</th><th>Razón social</th><th>Teléfono</th><th>Correo</th><th>Dirección</th><th>Acción</th></tr></thead>
+            <tbody><tr th:each="item : ${proveedores}"><td th:text="${item.identificacion}"></td><td th:text="${item.nombre}"></td><td th:text="${item.telefono}"></td><td th:text="${item.correo}"></td><td th:text="${item.direccion}"></td>
+                <td><form th:if="${isSuperadmin}" th:action="@{/admin/eliminaciones/PROVEEDOR/{id}(id=${item.idProveedor})}" method="post" onsubmit="return confirm('¿Eliminar este proveedor si no tiene compras?')"><button class="button button-danger button-small" type="submit">Eliminar</button></form></td></tr>
+                <tr th:if="${#lists.isEmpty(proveedores)}"><td class="empty-state" colspan="6">Aún no hay proveedores registrados.</td></tr></tbody>
         </table></div>
     </section>
 </main>

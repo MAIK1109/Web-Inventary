@@ -8,11 +8,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 import java.time.LocalDate;
 
 public interface ComprasRepository extends JpaRepository<ComprasEntity, Integer> {
+    boolean existsByProveedor_IdProveedor(Integer proveedorId);
+
     @EntityGraph(attributePaths = {"proveedor", "detalles", "detalles.producto"})
     List<ComprasEntity> findAllByOrderByFechaDesc();
+
+    @EntityGraph(attributePaths = {"proveedor", "detalles", "detalles.producto"})
+    @Query("select c from ComprasEntity c where c.idCompra = :id")
+    Optional<ComprasEntity> buscarParaAnular(@Param("id") Integer id);
 
     @EntityGraph(attributePaths = {"detalles", "detalles.producto"})
     List<ComprasEntity> findByFechaLessThanEqualAndEstadoOrderByFechaDesc(LocalDate fecha, Byte estado);

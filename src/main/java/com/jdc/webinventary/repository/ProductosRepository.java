@@ -19,6 +19,12 @@ public interface ProductosRepository extends JpaRepository<ProductosEntity, Inte
 
     boolean existsByCodigoIgnoreCaseAndIdProductoNot(String codigo, Integer idProducto);
 
+    @Query("select case when count(d) > 0 then true else false end from DetalleComprasEntity d where d.producto.idProducto = :id")
+    boolean tieneDetallesCompra(@Param("id") Integer id);
+
+    @Query("select case when count(d) > 0 then true else false end from DetalleVentasEntity d where d.producto.idProducto = :id")
+    boolean tieneDetallesVenta(@Param("id") Integer id);
+
     List<ProductosEntity> findByEstadoIsNullOrEstado(Byte estado, Sort sort);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

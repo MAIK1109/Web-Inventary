@@ -23,6 +23,8 @@ public class RegistroClienteService {
         return clientesRepository.existsByIdentificacionIgnoreCase(identificacion.trim());
     }
 
+    public java.util.List<ClientesEntity> listar() { return clientesRepository.findAll(); }
+
     @Transactional
     public void registrar(RegistroClienteForm form) {
         ClientesEntity cliente = new ClientesEntity();

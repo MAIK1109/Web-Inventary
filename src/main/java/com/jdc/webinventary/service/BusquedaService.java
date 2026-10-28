@@ -94,6 +94,7 @@ public class BusquedaService {
         case 0 -> "Pendiente";
         case 1 -> "Confirmado / aprobado";
         case 2 -> "Rechazado";
+        case 3 -> "Anulado";
         default -> estado.toString();
     }; }
 

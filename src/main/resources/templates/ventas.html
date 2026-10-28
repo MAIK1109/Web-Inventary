@@ -58,7 +58,7 @@
             <tbody><tr th:each="item : ${ventas}"><td th:text="${item.idVenta}"></td><td th:text="${item.fecha}"></td>
                 <td th:text="${item.vendedor == null ? 'Sin asignar' : item.vendedor.nombre}"></td><td th:text="${item.cliente.nombre}"></td>
                 <td th:text="${#lists.size(item.detalles)}"></td><td th:text="${totales[item.idVenta]}"></td>
-                <td th:text="${item.estado == 1 ? 'CONFIRMADA' : item.estado}"></td></tr>
+                <td th:text="${item.estado == 3 ? 'ANULADA' : (item.estado == 1 ? 'CONFIRMADA' : item.estado)}"></td></tr>
                 <tr th:if="${#lists.isEmpty(ventas)}"><td class="empty-state" colspan="7">Aún no hay ventas registradas.</td></tr></tbody>
         </table></div>
     </section>

@@ -27,6 +27,7 @@ public class ClientesController {
         if (!model.containsAttribute("cliente")) {
             model.addAttribute("cliente", new RegistroClienteForm());
         }
+        model.addAttribute("clientes", registroClienteService.listar());
         return "clientes";
     }
 
@@ -45,6 +46,7 @@ public class ClientesController {
         }
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("clientes", registroClienteService.listar());
             return "clientes";
         }
 
@@ -52,6 +54,7 @@ public class ClientesController {
             registroClienteService.registrar(form);
         } catch (RegistroClienteService.IdentificacionDuplicadaException ex) {
             bindingResult.rejectValue("identificacion", "identificacion.duplicada", ex.getMessage());
+            model.addAttribute("clientes", registroClienteService.listar());
             return "clientes";
         }
 

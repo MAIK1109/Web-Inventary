@@ -104,6 +104,7 @@ public class DashboardVendedorService {
             case 0 -> "PENDIENTE";
             case 1 -> "CONFIRMADO";
             case 2 -> "RECHAZADO";
+            case 3 -> "ANULADO";
             default -> estado.toString();
         };
     }

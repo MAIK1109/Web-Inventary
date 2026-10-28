@@ -11,6 +11,7 @@
         <p>Guarda los datos de contacto y define si desea recibir sus comprobantes por correo.</p>
     </header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
 
     <section class="form-card">
         <form th:action="@{/clientes}" th:object="${cliente}" method="post">
@@ -50,6 +51,14 @@
             </div>
         </form>
     </section>
+<section class="table-card" style="margin-top:20px">
+    <div class="table-top"><div><h2>Clientes registrados</h2><p>La eliminación solo está disponible para Superadministrador y clientes sin ventas.</p></div></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Identificación</th><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Acción</th></tr></thead>
+        <tbody><tr th:each="item : ${clientes}"><td th:text="${item.identificacion}"></td><td th:text="${item.nombre}"></td><td th:text="${item.telefono}"></td><td th:text="${item.correo == null ? '—' : item.correo}"></td>
+            <td><form th:if="${isSuperadmin}" th:action="@{/admin/eliminaciones/CLIENTE/{id}(id=${item.idCliente})}" method="post" onsubmit="return confirm('¿Eliminar este cliente si no tiene ventas?')"><button class="button button-danger button-small" type="submit">Eliminar</button></form></td></tr>
+            <tr th:if="${#lists.isEmpty(clientes)}"><td colspan="5" class="empty-state">Aún no hay clientes registrados.</td></tr></tbody>
+    </table></div>
+</section>
 </main>
 
 <footer th:replace="~{Layout/layout :: footer}"></footer>

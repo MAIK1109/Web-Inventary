@@ -50,12 +50,12 @@
     </section>
     <section class="table-card" style="margin-top:20px">
         <div class="table-top"><div><h2>Gastos del período</h2><p>Registro de egresos incluidos en el cálculo.</p></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Comprobante</th><th>Registrado por</th></tr></thead>
-            <tbody><tr th:each="gastoItem : ${resumen.gastosDetalle}"><td th:text="${gastoItem.fecha}"></td><td th:text="${gastoItem.concepto}"></td>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Comprobante</th><th>Registrado por</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="gastoItem : ${resumen.gastosDetalle}"><td th:text="${gastoItem.idGasto}"></td><td th:text="${gastoItem.fecha}"></td><td th:text="${gastoItem.concepto}"></td>
                 <td th:text="${gastoItem.categoria == null ? '—' : gastoItem.categoria}"></td><td th:text="${gastoItem.monto}"></td>
                 <td><a th:if="${gastoItem.comprobanteArchivo != null}" th:href="@{/dashboard/financiero/gastos/{id}/comprobante(id=${gastoItem.idGasto})}">Descargar</a><span th:if="${gastoItem.comprobanteArchivo == null}">—</span></td>
-                <td th:text="${gastoItem.usuario.nombre}"></td></tr>
-                <tr th:if="${#lists.isEmpty(resumen.gastosDetalle)}"><td class="empty-state" colspan="6">No hay gastos registrados en este período.</td></tr></tbody>
+                <td th:text="${gastoItem.usuario.nombre}"></td><td th:text="${gastoItem.estado == 3 ? 'ANULADO' : 'VIGENTE'}"></td></tr>
+                <tr th:if="${#lists.isEmpty(resumen.gastosDetalle)}"><td class="empty-state" colspan="8">No hay gastos registrados en este período.</td></tr></tbody>
         </table></div>
     </section>
     <p class="field-hint" style="margin-top:16px">Los importes usan las unidades monetarias del sistema. “Ventas netas” representa ventas confirmadas; descuentos, devoluciones e impuestos no se restan porque no están registrados en el modelo. El margen es neto estimado.</p>

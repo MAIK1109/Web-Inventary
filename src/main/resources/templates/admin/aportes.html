@@ -15,14 +15,15 @@
         <div class="table-top"><div><h2>Capital aportado</h2><p>Total de aportes aprobados</p></div>
             <strong th:text="${totalGeneral}">0</strong></div>
         <div class="table-wrap"><table class="data-table">
-            <thead><tr><th>Usuario</th><th>Fecha</th><th>Monto</th><th>Medio de pago</th><th>Soporte</th><th>Estado</th><th>Capital del usuario</th><th>Acciones</th></tr></thead>
+            <thead><tr><th>Número</th><th>Usuario</th><th>Fecha</th><th>Monto</th><th>Medio de pago</th><th>Soporte</th><th>Estado</th><th>Capital del usuario</th><th>Acciones</th></tr></thead>
             <tbody>
             <tr th:each="aporte : ${aportes}">
+                <td th:text="${aporte.idInversion}"></td>
                 <td><strong th:text="${aporte.usuario.nombre}"></strong><small class="table-subtext" th:text="${aporte.usuario.correo}"></small></td>
                 <td th:text="${aporte.fecha}"></td><td th:text="${aporte.monto}"></td>
                 <td th:text="${aporte.medioPago}"></td>
                 <td><a th:if="${aporte.soporteArchivo != null}" th:href="@{/admin/aportes/{id}/soporte(id=${aporte.idInversion})}">Descargar</a><span th:if="${aporte.soporteArchivo == null}">—</span></td>
-                <td><span class="status-pill" th:text="${aporte.estado == 0 ? 'PENDIENTE' : (aporte.estado == 1 ? 'APROBADO' : 'RECHAZADO')}"></span>
+                <td><span class="status-pill" th:text="${aporte.estado == 0 ? 'PENDIENTE' : (aporte.estado == 1 ? 'APROBADO' : (aporte.estado == 3 ? 'ANULADO' : 'RECHAZADO'))}"></span>
                     <small class="table-subtext" th:if="${aporte.aprobadoPor != null}" th:text="|Por ${aporte.aprobadoPor}|"></small></td>
                 <td th:text="${totalesPorUsuario[aporte.usuario.idUsuario] == null ? 0 : totalesPorUsuario[aporte.usuario.idUsuario]}"></td>
                 <td><div class="table-actions" th:if="${aporte.estado == estadoPendiente}">
@@ -30,7 +31,7 @@
                     <form th:action="@{/admin/aportes/{id}/rechazar(id=${aporte.idInversion})}" method="post"><button class="button button-danger button-small" type="submit">Rechazar</button></form>
                 </div></td>
             </tr>
-            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state" colspan="8">Todavía no hay aportes registrados.</td></tr>
+            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state" colspan="9">Todavía no hay aportes registrados.</td></tr>
             </tbody>
         </table></div>
     </section>
