@@ -37,11 +37,17 @@ public class EliminacionRestringidaService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<AnulacionesEntity> historial() { return anulaciones.findAllByTipoOperacionOrderByFechaAnulacionDesc("VENTA"); }
+    public java.util.List<AnulacionesEntity> historial() { return anulaciones.findAllByOrderByFechaAnulacionDesc(); }
 
     @Transactional(readOnly = true)
     public java.util.List<VentasEntity> ventasConfirmadasParaAnular() {
         return ventas.findAllByEstadoOrderByFechaDesc((byte) 1);
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.List<ComprasEntity> comprasConfirmadasParaAnular() {
+        return compras.findAllByOrderByFechaDesc().stream()
+                .filter(compra -> compra.getEstado() != null && compra.getEstado() == 1).toList();
     }
 
     @Transactional
@@ -50,6 +56,32 @@ public class EliminacionRestringidaService {
             throw new IllegalArgumentException("El identificador de venta y un motivo de hasta 250 caracteres son obligatorios.");
         UsuariosEntity actor = usuarios.findById(usuarioId).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
         aplicarAnulacionVenta(id, motivo.trim(), actor);
+    }
+
+    @Transactional
+    public void anularCompra(Integer id, String motivo, Integer usuarioId) {
+        if (id == null || motivo == null || motivo.isBlank() || motivo.trim().length() > 250)
+            throw new IllegalArgumentException("El identificador de compra y un motivo de hasta 250 caracteres son obligatorios.");
+        UsuariosEntity actor = usuarios.findById(usuarioId).orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado."));
+        if (anulaciones.existsByTipoOperacionAndOperacionId("COMPRA", id))
+            throw new IllegalArgumentException("La compra ya fue anulada.");
+        ComprasEntity compra = compras.buscarParaAnular(id).orElseThrow(() -> noExiste("compra"));
+        comprobarActivo(compra.getEstado());
+        for (DetalleComprasEntity detalle : compra.getDetalles()) {
+            ProductosEntity producto = productos.findByIdForUpdate(detalle.getProducto().getIdProducto())
+                    .orElseThrow(() -> new IllegalArgumentException("No se encontró un producto de la compra."));
+            int cantidad = detalle.getCantidad() == null ? 0 : detalle.getCantidad();
+            int stockActual = producto.getStockActual() == null ? 0 : producto.getStockActual();
+            if (stockActual < cantidad)
+                throw new IllegalArgumentException("No se puede anular: el stock actual de " + producto.getNombre()
+                        + " es menor que la cantidad ingresada en la compra.");
+            producto.setStockActual(stockActual - cantidad);
+            estadoAlertas.registrarEstadoActual(producto);
+            movimientos.save(new MovimientosInventariosEntity(null, "ANULACION_COMPRA", cantidad,
+                    "ANULACION-COMPRA-" + id, LocalDate.now(), actor, producto));
+        }
+        compra.setEstado((byte) 3);
+        registrar("COMPRA", id, motivo.trim(), actor);
     }
 
     private void aplicarAnulacionVenta(Integer id, String motivo, UsuariosEntity actor) {

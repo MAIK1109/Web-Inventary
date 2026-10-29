@@ -46,7 +46,7 @@ public class RegistroCuentaService {
         usuario.setTelefono(form.getTelefono().trim());
         usuario.setCorreo(form.getCorreo().trim().toLowerCase(Locale.ROOT));
         usuario.setHashPassword(passwordEncoder.encode(form.getPassword()));
-        usuario.setRol("USUARIO");
+        usuario.setRol("VENDEDOR_INVERSIONISTA");
         usuario.setVerificado("NO");
         usuario.setEstadoCuenta("PENDIENTE");
 

@@ -25,9 +25,9 @@ public class CuentaUserDetails implements UserDetails {
         this.verificado = usuario.getVerificado();
 
         String rol = usuario.getRol();
-        if (rol == null || !List.of("SUPERADMIN", "ADMINISTRADOR", "USUARIO").contains(rol)) {
-            rol = "USUARIO";
-        }
+        if (rol == null || rol.isBlank() || "USUARIO".equals(rol)) rol = "VENDEDOR_INVERSIONISTA";
+        if (!List.of("SUPERADMIN", "ADMINISTRADOR", "VENDEDOR_INVERSIONISTA").contains(rol))
+            rol = "VENDEDOR_INVERSIONISTA";
         this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + rol));
     }
 

@@ -41,6 +41,7 @@
                     <label for="rol">Rol de acceso</label>
                     <select id="rol" th:field="*{rol}">
                         <option value="USUARIO">Usuario</option>
+                        <option value="VENDEDOR_INVERSIONISTA">Vendedor-inversionista</option>
                         <option value="ADMINISTRADOR">Administrador</option>
                         <option th:if="${usuario.rol == 'SUPERADMIN'}" value="SUPERADMIN">Superadministrador</option>
                     </select>

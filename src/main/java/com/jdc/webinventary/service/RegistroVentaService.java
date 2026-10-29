@@ -136,6 +136,11 @@ public class RegistroVentaService {
 
     public List<VentasEntity> listar() { return ventasRepository.findAllByOrderByFechaDesc(); }
 
+    @Transactional(readOnly = true)
+    public List<VentasEntity> listarPorVendedor(Integer usuarioId) {
+        return ventasRepository.findByVendedor_IdUsuarioOrderByFechaDesc(usuarioId);
+    }
+
     public long calcularTotal(VentasEntity venta) {
         long total = 0;
         for (DetalleVentasEntity detalle : venta.getDetalles()) {

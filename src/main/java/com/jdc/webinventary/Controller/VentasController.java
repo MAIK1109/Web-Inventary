@@ -36,9 +36,9 @@ public class VentasController {
     }
 
     @GetMapping
-    public String mostrar(Model model) {
+    public String mostrar(Model model, @AuthenticationPrincipal CuentaUserDetails principal) {
         if (!model.containsAttribute("venta")) model.addAttribute("venta", new RegistroVentaForm());
-        preparar(model);
+        preparar(model, principal);
         return "ventas";
     }
 
@@ -47,7 +47,7 @@ public class VentasController {
                             BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
                             Model model, RedirectAttributes redirect) {
         if (binding.hasErrors()) {
-            preparar(model);
+            preparar(model, principal);
             return "ventas";
         }
         try {
@@ -57,16 +57,19 @@ public class VentasController {
                     " confirmada. Total: " + total + ". Se registraron los movimientos de salida.");
         } catch (RegistroVentaService.StockInsuficienteException | IllegalArgumentException ex) {
             binding.reject("venta.invalida", ex.getMessage());
-            preparar(model);
+            preparar(model, principal);
             return "ventas";
         }
         return "redirect:/ventas";
     }
 
-    private void preparar(Model model) {
+    private void preparar(Model model, CuentaUserDetails principal) {
         model.addAttribute("clientes", clientes.findAll(Sort.by("nombre").ascending()));
         model.addAttribute("productos", productos.findByEstadoIsNullOrEstado((byte) 1, Sort.by("nombre").ascending()));
-        var ventasRegistradas = registroVenta.listar();
+        boolean superadmin = principal.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_SUPERADMIN".equals(a.getAuthority()));
+        var ventasRegistradas = superadmin ? registroVenta.listar()
+                : registroVenta.listarPorVendedor(principal.getIdUsuario());
         Map<Integer, Long> totales = new LinkedHashMap<>();
         for (VentasEntity venta : ventasRegistradas) {
             totales.put(venta.getIdVenta(), registroVenta.calcularTotal(venta));
