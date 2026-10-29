@@ -1,6 +1,7 @@
 package com.jdc.webinventary.Controller;
 
 import com.jdc.webinventary.repository.UsuariosRepository;
+import com.jdc.webinventary.entity.ProductosEntity;
 import com.jdc.webinventary.service.BusquedaService;
 import com.jdc.webinventary.security.CuentaUserDetails;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 public class BusquedaController {
@@ -24,7 +26,9 @@ public class BusquedaController {
     }
 
     @GetMapping("/busqueda")
-    public String buscar(@RequestParam(required = false) String producto,
+    public String buscar(@RequestParam(required = false) String codigo,
+                         @RequestParam(required = false) String nombre,
+                         @RequestParam(required = false) String categoria,
                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
                          @RequestParam(required = false) Integer usuarioId,
@@ -38,13 +42,24 @@ public class BusquedaController {
         } else {
             model.addAttribute("transacciones", busqueda.buscarTransacciones(desde, hasta, usuarioVisible, estado));
         }
-        model.addAttribute("productos", busqueda.buscarProductos(producto));
+        List<ProductosEntity> catalogo = busqueda.listarProductosParaFiltro();
+        model.addAttribute("productos", busqueda.buscarProductos(codigo, nombre, categoria));
+        model.addAttribute("codigosProducto", opciones(catalogo, ProductosEntity::getCodigo));
+        model.addAttribute("nombresProducto", opciones(catalogo, ProductosEntity::getNombre));
+        model.addAttribute("categoriasProducto", List.of("Producto de consumo", "Producto industrial"));
         if (superadmin) model.addAttribute("usuarios", usuarios.findAll(Sort.by("nombre").ascending()));
-        model.addAttribute("filtroProducto", producto);
+        model.addAttribute("filtroCodigo", codigo);
+        model.addAttribute("filtroNombre", nombre);
+        model.addAttribute("filtroCategoria", categoria);
         model.addAttribute("desde", desde);
         model.addAttribute("hasta", hasta);
         model.addAttribute("usuarioId", usuarioVisible);
         model.addAttribute("estado", estado);
         return "busqueda";
+    }
+
+    private List<String> opciones(List<ProductosEntity> catalogo, java.util.function.Function<ProductosEntity, String> campo) {
+        return catalogo.stream().map(campo).filter(valor -> valor != null && !valor.isBlank())
+                .distinct().sorted(String.CASE_INSENSITIVE_ORDER).toList();
     }
 }

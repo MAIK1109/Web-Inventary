@@ -2,6 +2,7 @@ package com.jdc.webinventary.service;
 
 import com.jdc.webinventary.entity.*;
 import com.jdc.webinventary.repository.*;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class BusquedaService {
@@ -30,15 +32,25 @@ public class BusquedaService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductosEntity> buscarProductos(String termino) {
-        if (termino == null || termino.isBlank()) return productos.findAll(Sort.by("nombre").ascending());
-        String filtro = termino.trim().toLowerCase();
-        Specification<ProductosEntity> criterio = (root, query, cb) -> cb.or(
-                cb.like(cb.lower(root.get("codigo")), "%" + filtro + "%"),
-                cb.like(cb.lower(root.get("nombre")), "%" + filtro + "%"),
-                cb.like(cb.lower(root.get("categoriaProducto")), "%" + filtro + "%"));
+    public List<ProductosEntity> listarProductosParaFiltro() {
+        return productos.findAll(Sort.by("nombre").ascending());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductosEntity> buscarProductos(String codigo, String nombre, String categoria) {
+        Specification<ProductosEntity> criterio = (root, query, cb) -> {
+            List<Predicate> condiciones = new ArrayList<>();
+            if (tieneValor(codigo)) condiciones.add(cb.equal(cb.lower(root.get("codigo")), normalizar(codigo)));
+            if (tieneValor(nombre)) condiciones.add(cb.equal(cb.lower(root.get("nombre")), normalizar(nombre)));
+            if (tieneValor(categoria)) condiciones.add(cb.equal(cb.lower(root.get("categoriaProducto")), normalizar(categoria)));
+            return cb.and(condiciones.toArray(Predicate[]::new));
+        };
         return productos.findAll(criterio, Sort.by("nombre").ascending());
     }
+
+    private boolean tieneValor(String valor) { return valor != null && !valor.isBlank(); }
+
+    private String normalizar(String valor) { return valor.trim().toLowerCase(Locale.ROOT); }
 
     @Transactional(readOnly = true)
     public List<FilaTransaccion> buscarTransacciones(LocalDate desde, LocalDate hasta,

@@ -23,21 +23,6 @@
             <tr th:if="${#lists.isEmpty(ventasConfirmadas)}"><td class="empty-state" colspan="7">No hay ventas confirmadas para anular.</td></tr></tbody>
         </table></div>
     </section>
-    <section class="table-card" style="margin-top:20px">
-        <div class="table-top"><div><h2>Compras confirmadas</h2><p>La anulación revierte existencias. Si el stock actual ya no permite revertirla, primero revisa los movimientos.</p></div></div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Proveedor</th><th>Productos</th><th>Total</th><th>Motivo y acción</th></tr></thead>
-            <tbody><tr th:each="compra : ${comprasConfirmadas}">
-                <td th:text="${compra.idCompra}"></td><td th:text="${compra.fecha}"></td>
-                <td th:text="${compra.proveedor.nombre}"></td><td th:text="${#lists.size(compra.detalles)}"></td>
-                <td th:text="${totalesCompras[compra.idCompra]}"></td>
-                <td><form th:action="@{/admin/anulaciones/compra/{id}(id=${compra.idCompra})}" method="post" style="display:flex;gap:8px;min-width:300px">
-                    <input name="motivo" maxlength="250" placeholder="Motivo obligatorio" required>
-                    <button class="button button-secondary button-small" type="submit">Anular compra</button>
-                </form></td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(comprasConfirmadas)}"><td class="empty-state" colspan="6">No hay compras confirmadas para anular.</td></tr></tbody>
-        </table></div>
-    </section>
     <section class="form-card" style="margin-top:20px">
         <h2>Anular una venta</h2>
         <form id="anulacion-form" th:action="@{/admin/anulaciones}" method="post" class="form-grid">

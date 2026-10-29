@@ -122,6 +122,12 @@ h1, h2, h3 { font-family: Manrope, 'Segoe UI', sans-serif; color: var(--navy); }
 .form-card .report-filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 20px; align-items: end; }
 .report-filter-action { display: flex; align-items: flex-end; }
 .report-filter-action .button { width: 100%; min-height: 48px; }
+.product-search-form, .transaction-filter-form { padding: 22px 25px; display: grid; gap: 18px 20px; align-items: end; border-bottom: 1px solid var(--line); }
+.product-search-form { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.product-search-form .button, .transaction-filter-action .button { width: 100%; min-height: 48px; }
+.transaction-filter-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.transaction-filter-action { display: flex; align-items: flex-end; }
+.transaction-filter-hint { margin: 0; padding: 14px 25px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .field { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .field-full { grid-column: 1 / -1; }
@@ -218,6 +224,8 @@ h1, h2, h3 { font-family: Manrope, 'Segoe UI', sans-serif; color: var(--navy); }
     .table-top > * { min-width: 0; }
     .form-card, .info-card { border-radius: 17px; }
     .form-card .report-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .product-search-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .transaction-filter-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 680px) {
     .nav-wrap { min-height: 68px; }
@@ -232,6 +240,7 @@ h1, h2, h3 { font-family: Manrope, 'Segoe UI', sans-serif; color: var(--navy); }
     .section-title { align-items: flex-start; flex-direction: column; }
     .form-grid { grid-template-columns: 1fr; }
     .form-card .report-filter-grid { grid-template-columns: 1fr; }
+    .product-search-form, .transaction-filter-form { grid-template-columns: 1fr; padding: 18px; }
     .report-filter-card { padding: 20px 16px; }
     .field-full { grid-column: auto; }
     .auth-wrap { width: calc(100% - 28px); margin: 20px auto 44px; grid-template-columns: 1fr; border-radius: 20px; }

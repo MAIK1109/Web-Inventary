@@ -12,6 +12,4 @@ public interface AnulacionesRepository extends JpaRepository<AnulacionesEntity, 
     @EntityGraph(attributePaths = "usuario")
     List<AnulacionesEntity> findAllByTipoOperacionOrderByFechaAnulacionDesc(String tipoOperacion);
 
-    @EntityGraph(attributePaths = "usuario")
-    List<AnulacionesEntity> findAllByOrderByFechaAnulacionDesc();
 }

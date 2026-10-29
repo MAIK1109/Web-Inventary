@@ -8,36 +8,44 @@
         <p>Encuentra productos por código, nombre o categoría, y filtra transacciones por fecha, usuario y estado.</p></header>
     <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
     <section class="table-card">
-        <div class="table-top"><div><h2>Buscar productos</h2><p>La búsqueda coincide parcialmente y no distingue mayúsculas.</p></div></div>
-        <form method="get" th:action="@{/busqueda}" class="form-grid">
-            <label>Código, nombre o categoría<input type="search" name="producto" th:value="${filtroProducto}" placeholder="Ej. café, CAT-01"></label>
-            <button class="button button-primary" type="submit">Buscar productos</button>
+        <div class="table-top"><div><h2>Buscar productos</h2><p>Filtra por código, nombre, categoría o combina los tres criterios.</p></div></div>
+        <form method="get" th:action="@{/busqueda}" class="product-search-form">
+            <div class="field"><label for="codigo">Código</label><select id="codigo" name="codigo"><option value="">Todos</option>
+                <option th:each="opcion : ${codigosProducto}" th:value="${opcion}" th:selected="${opcion == filtroCodigo}" th:text="${opcion}"></option>
+            </select></div>
+            <div class="field"><label for="nombre">Nombre</label><select id="nombre" name="nombre"><option value="">Todos</option>
+                <option th:each="opcion : ${nombresProducto}" th:value="${opcion}" th:selected="${opcion == filtroNombre}" th:text="${opcion}"></option>
+            </select></div>
+            <div class="field"><label for="categoria">Categoría</label><select id="categoria" name="categoria"><option value="">Todas</option>
+                <option th:each="opcion : ${categoriasProducto}" th:value="${opcion}" th:selected="${opcion == filtroCategoria}" th:text="${opcion}"></option>
+            </select></div>
+            <button class="button button-primary" type="submit">Filtrar productos</button>
         </form>
-        <div class="table-wrap" style="margin-top: 18px"><table class="data-table"><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Existencias</th><th>Precio</th></tr></thead>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Existencias</th><th>Precio</th></tr></thead>
             <tbody><tr th:each="item : ${productos}"><td th:text="${item.codigo}"></td><td th:text="${item.nombre}"></td><td th:text="${item.categoriaProducto}"></td><td th:text="${item.stockActual}"></td><td th:text="${item.precioVenta}"></td></tr>
             <tr th:if="${#lists.isEmpty(productos)}"><td class="empty-state" colspan="5">No se encontraron productos.</td></tr></tbody>
         </table></div>
     </section>
     <section class="table-card" style="margin-top: 20px">
         <div class="table-top"><div><h2>Filtrar transacciones</h2><p>Incluye ventas, compras, aportes y movimientos de inventario.</p></div></div>
-        <form method="get" th:action="@{/busqueda}" class="form-grid">
-            <label>Desde<input type="date" name="desde" th:value="${desde}"></label>
-            <label>Hasta<input type="date" name="hasta" th:value="${hasta}"></label>
-            <label>Usuario
-                <select name="usuarioId"><option value="">Todos</option>
+        <form method="get" th:action="@{/busqueda}" class="transaction-filter-form">
+            <div class="field"><label for="transaccion-desde">Desde</label><input id="transaccion-desde" type="date" name="desde" th:value="${desde}"></div>
+            <div class="field"><label for="transaccion-hasta">Hasta</label><input id="transaccion-hasta" type="date" name="hasta" th:value="${hasta}"></div>
+            <div class="field" th:if="${usuarios != null}"><label for="usuarioId">Usuario</label>
+                <select id="usuarioId" name="usuarioId"><option value="">Todos</option>
                     <option th:each="usuario : ${usuarios}" th:value="${usuario.idUsuario}" th:selected="${usuario.idUsuario == usuarioId}" th:text="${usuario.nombre}"></option>
                 </select>
-            </label>
-            <label>Estado
-                <select name="estado"><option value="">Todos</option>
+            </div>
+            <div class="field"><label for="estado">Estado</label>
+                <select id="estado" name="estado"><option value="">Todos</option>
                     <option value="0" th:selected="${estado != null and estado == 0}">Pendiente</option>
                     <option value="1" th:selected="${estado != null and estado == 1}">Confirmado / aprobado</option>
                     <option value="2" th:selected="${estado != null and estado == 2}">Rechazado</option>
                 </select>
-            </label>
-            <button class="button button-primary" type="submit">Aplicar filtros</button>
+            </div>
+            <div class="transaction-filter-action"><button class="button button-primary" type="submit">Aplicar filtros</button></div>
         </form>
-        <p class="field-hint" style="margin: 14px 0">Compras no tienen usuario asociado en el modelo. Los movimientos no tienen estado y no aparecen al filtrar por uno.</p>
+        <p class="field-hint transaction-filter-hint">Compras no tienen usuario asociado en el modelo. Los movimientos no tienen estado y no aparecen al filtrar por uno.</p>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Tipo</th><th>N.º</th><th>Fecha</th><th>Usuario</th><th>Estado</th><th>Detalle</th></tr></thead>
             <tbody><tr th:each="fila : ${transacciones}"><td th:text="${fila.tipo}"></td><td th:text="${fila.id}"></td><td th:text="${fila.fecha}"></td><td th:text="${fila.usuario}"></td><td th:text="${fila.estado}"></td><td th:text="${fila.detalle}"></td></tr>
             <tr th:if="${transacciones != null and #lists.isEmpty(transacciones)}"><td class="empty-state" colspan="6">No se encontraron transacciones con esos filtros.</td></tr></tbody>

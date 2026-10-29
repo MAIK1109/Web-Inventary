@@ -2,7 +2,6 @@ package com.jdc.webinventary.Controller;
 
 import com.jdc.webinventary.dto.MotivoAnulacionForm;
 import com.jdc.webinventary.entity.VentasEntity;
-import com.jdc.webinventary.entity.ComprasEntity;
 import com.jdc.webinventary.security.CuentaUserDetails;
 import com.jdc.webinventary.service.EliminacionRestringidaService;
 import jakarta.validation.Valid;
@@ -36,16 +35,6 @@ public class EliminacionesController {
         }
         model.addAttribute("ventasConfirmadas", ventasConfirmadas);
         model.addAttribute("totalesVentas", totalesVentas);
-        var comprasConfirmadas = eliminaciones.comprasConfirmadasParaAnular();
-        Map<Integer, Long> totalesCompras = new HashMap<>();
-        for (ComprasEntity compra : comprasConfirmadas) {
-            long total = compra.getDetalles().stream().mapToLong(detalle ->
-                    (long) (detalle.getCantidad() == null ? 0 : detalle.getCantidad())
-                            * (detalle.getCostoUnitario() == null ? 0 : detalle.getCostoUnitario())).sum();
-            totalesCompras.put(compra.getIdCompra(), total);
-        }
-        model.addAttribute("comprasConfirmadas", comprasConfirmadas);
-        model.addAttribute("totalesCompras", totalesCompras);
         return "admin/anulaciones";
     }
 
@@ -61,22 +50,6 @@ public class EliminacionesController {
         try {
             eliminaciones.anularVenta(id, form.getMotivo(), principal.getIdUsuario());
             redirect.addFlashAttribute("mensaje", "Venta " + id + " anulada con trazabilidad.");
-        } catch (IllegalArgumentException ex) { redirect.addFlashAttribute("error", ex.getMessage()); }
-        return "redirect:/admin/anulaciones";
-    }
-
-    @PostMapping("/admin/anulaciones/compra/{id}")
-    public String anularCompra(@PathVariable Integer id,
-                         @Valid @ModelAttribute("form") MotivoAnulacionForm form,
-                         BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
-                         RedirectAttributes redirect) {
-        if (binding.hasErrors()) {
-            redirect.addFlashAttribute("error", binding.getAllErrors().get(0).getDefaultMessage());
-            return "redirect:/admin/anulaciones";
-        }
-        try {
-            eliminaciones.anularCompra(id, form.getMotivo(), principal.getIdUsuario());
-            redirect.addFlashAttribute("mensaje", "Compra " + id + " anulada con trazabilidad.");
         } catch (IllegalArgumentException ex) { redirect.addFlashAttribute("error", ex.getMessage()); }
         return "redirect:/admin/anulaciones";
     }
