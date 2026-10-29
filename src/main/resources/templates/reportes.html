@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Reportes de ventas')}"></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Consulta y exportación</p><h1>Reportes de ventas</h1>
+        <p>Filtra por período, producto, cliente y, según tu rol, vendedor. Los usuarios consultan únicamente sus ventas.</p></header>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
+    <section class="table-card">
+        <form method="get" th:action="@{/reportes}" class="form-grid">
+            <label>Desde<input type="date" name="desde" th:value="${desde}" required></label>
+            <label>Hasta<input type="date" name="hasta" th:value="${hasta}" required></label>
+            <label>Producto<select name="productoId"><option value="">Todos</option>
+                <option th:each="producto : ${productos}" th:value="${producto.idProducto}" th:selected="${producto.idProducto == productoId}" th:text="|${producto.codigo} — ${producto.nombre}|"></option>
+            </select></label>
+            <label>Cliente<select name="clienteId"><option value="">Todos</option>
+                <option th:each="cliente : ${clientes}" th:value="${cliente.idCliente}" th:selected="${cliente.idCliente == clienteId}" th:text="${cliente.nombre}"></option>
+            </select></label>
+            <label th:if="${puedeVerTodos}">Vendedor<select name="vendedorId"><option value="">Todos</option>
+                <option th:each="vendedor : ${vendedores}" th:value="${vendedor.idUsuario}" th:selected="${vendedor.idUsuario == vendedorId}" th:text="${vendedor.nombre}"></option>
+            </select></label>
+            <button class="button button-primary" type="submit">Aplicar filtros</button>
+        </form>
+    </section>
+    <section class="action-grid" style="margin:20px 0">
+        <article class="info-card"><p class="eyebrow">Líneas encontradas</p><h2 th:text="${#lists.size(reporte.filas)}">0</h2><p>Detalle de ventas en el período</p></article>
+        <article class="info-card"><p class="eyebrow">Total confirmado</p><h2 th:text="${reporte.totalConfirmado}">0</h2><p>Las ventas anuladas no se suman</p></article>
+        <article class="info-card"><p class="eyebrow">Líneas anuladas</p><h2 th:text="${reporte.lineasAnuladas}">0</h2><p>Se conservan para trazabilidad</p></article>
+    </section>
+    <section class="table-card">
+        <div class="table-top"><div><h2>Detalle del reporte</h2><p th:text="|${reporte.desde} — ${reporte.hasta}|">Período</p></div>
+            <div class="table-actions">
+                <a class="button button-secondary button-small" th:href="@{/reportes/exportar/pdf(desde=${desde},hasta=${hasta},productoId=${productoId},clienteId=${clienteId},vendedorId=${vendedorId})}">Descargar PDF</a>
+                <a class="button button-primary button-small" th:href="@{/reportes/exportar/excel(desde=${desde},hasta=${hasta},productoId=${productoId},clienteId=${clienteId},vendedorId=${vendedorId})}">Descargar Excel</a>
+            </div>
+        </div>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Venta</th><th>Fecha</th><th>Cliente</th><th>Código</th><th>Producto</th><th>Vendedor</th><th>Cantidad</th><th>Precio unitario</th><th>Total</th><th>Estado</th></tr></thead>
+            <tbody><tr th:each="fila : ${reporte.filas}"><td th:text="${fila.ventaId}"></td><td th:text="${fila.fecha}"></td><td th:text="${fila.cliente}"></td>
+                <td th:text="${fila.codigoProducto}"></td><td th:text="${fila.producto}"></td><td th:text="${fila.vendedor}"></td>
+                <td th:text="${fila.cantidad}"></td><td th:text="${fila.precioUnitario}"></td><td th:text="${fila.total}"></td><td th:text="${fila.estado}"></td></tr>
+                <tr th:if="${#lists.isEmpty(reporte.filas)}"><td class="empty-state" colspan="10">No hay ventas que coincidan con los filtros.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
