@@ -28,7 +28,11 @@
                 </div>
                 <div class="field">
                     <label for="categoriaProducto">Categoría</label>
-                    <input id="categoriaProducto" type="text" th:field="*{categoriaProducto}" maxlength="45" required placeholder="Ej. Aseo">
+                    <select id="categoriaProducto" th:field="*{categoriaProducto}" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="Producto de consumo">Producto de consumo</option>
+                        <option value="Producto industrial">Producto industrial</option>
+                    </select>
                     <small class="field-error" th:if="${#fields.hasErrors('categoriaProducto')}" th:errors="*{categoriaProducto}"></small>
                 </div>
                 <div class="field field-full">

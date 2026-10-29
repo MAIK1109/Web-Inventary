@@ -55,7 +55,7 @@ public class ProductosService {
     private void actualizarDatos(ProductosEntity producto, ProductoForm form) {
         producto.setCodigo(normalizarCodigo(form.getCodigo()));
         producto.setNombre(form.getNombre().trim());
-        producto.setCategoriaProducto(form.getCategoriaProducto().trim());
+        producto.setCategoriaProducto(normalizarCategoria(form.getCategoriaProducto()));
         producto.setDescripcion(form.getDescripcion() == null || form.getDescripcion().isBlank()
                 ? null : form.getDescripcion().trim());
         producto.setPrecioCompraReferencia(form.getPrecioCompraReferencia());
@@ -74,6 +74,13 @@ public class ProductosService {
 
     private String normalizarCodigo(String codigo) {
         return codigo.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private String normalizarCategoria(String categoria) {
+        String valor = categoria.trim();
+        if ("Producto de consumo".equalsIgnoreCase(valor)) return "Producto de consumo";
+        if ("Producto industrial".equalsIgnoreCase(valor)) return "Producto industrial";
+        throw new IllegalArgumentException("Selecciona Producto de consumo o Producto industrial.");
     }
 
     public static class CodigoDuplicadoException extends RuntimeException {

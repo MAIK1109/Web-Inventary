@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
@@ -17,7 +18,8 @@ public class ProductoForm {
     private String nombre;
 
     @NotBlank(message = "La categoría es obligatoria")
-    @Size(max = 45, message = "La categoría no puede superar 45 caracteres")
+    @Pattern(regexp = "(?i)^(Producto de consumo|Producto industrial)$",
+            message = "Selecciona Producto de consumo o Producto industrial")
     private String categoriaProducto;
 
     @Size(max = 500, message = "La descripción no puede superar 500 caracteres")
