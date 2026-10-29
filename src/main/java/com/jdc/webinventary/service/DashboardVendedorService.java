@@ -37,6 +37,7 @@ public class DashboardVendedorService {
 
         long totalVentas = 0;
         long aportesConfirmados = 0;
+        long aportesPendientes = 0;
         Map<String, Long> cantidadesProducto = new HashMap<>();
         List<MovimientoPersonal> historial = new ArrayList<>();
         List<VentaPersonal> detalleVentas = new ArrayList<>();
@@ -69,6 +70,9 @@ public class DashboardVendedorService {
                 aportesConfirmados = Math.addExact(aportesConfirmados, monto);
                 long[] filaMes = meses.get(YearMonth.from(aporte.getFecha()));
                 filaMes[1] = Math.addExact(filaMes[1], monto);
+            } else if (aporte.getEstado() != null && aporte.getEstado() == 0) {
+                aportesPendientes = Math.addExact(aportesPendientes,
+                        aporte.getMonto() == null ? 0 : aporte.getMonto());
             }
             historial.add(new MovimientoPersonal("Aporte", aporte.getFecha(),
                     aporte.getMonto() == null ? 0 : aporte.getMonto(), textoEstado(aporte.getEstado())));
@@ -82,9 +86,10 @@ public class DashboardVendedorService {
         List<EvolucionMensual> evolucion = meses.entrySet().stream()
                 .map(entry -> new EvolucionMensual(entry.getKey().toString(), entry.getValue()[0], entry.getValue()[1]))
                 .toList();
-        return new Resumen(desde, hasta, aportesConfirmados, totalVentas,
+        return new Resumen(desde, hasta, aportesConfirmados, aportesPendientes, totalVentas,
                 (int) ventasPropias.stream().filter(v -> v.getEstado() == null || v.getEstado() == 1).count(),
                 (int) aportesPropios.stream().filter(a -> a.getEstado() != null && a.getEstado() == 1).count(),
+                (int) aportesPropios.stream().filter(a -> a.getEstado() != null && a.getEstado() == 0).count(),
                 productos, evolucion, detalleVentas, historial);
     }
 
@@ -114,8 +119,9 @@ public class DashboardVendedorService {
     public record MovimientoPersonal(String concepto, LocalDate fecha, long monto, String estado) { }
     public record VentaPersonal(Integer numero, LocalDate fecha, String cliente, long total,
                                 int cantidadProductos, String estado) { }
-    public record Resumen(LocalDate desde, LocalDate hasta, long aportesConfirmados, long ventas,
-                          int cantidadVentas, int cantidadAportesConfirmados,
+    public record Resumen(LocalDate desde, LocalDate hasta, long aportesConfirmados, long aportesPendientes,
+                          long ventas, int cantidadVentas, int cantidadAportesConfirmados,
+                          int cantidadAportesPendientes,
                           List<ProductoVendido> productosVendidos, List<EvolucionMensual> evolucionMensual,
                           List<VentaPersonal> detalleVentas, List<MovimientoPersonal> historial) { }
 }
