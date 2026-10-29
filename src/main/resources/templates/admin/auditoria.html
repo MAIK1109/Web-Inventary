@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{Layout/layout :: head('Auditoría')}" ></head>
+<body>
+<nav th:replace="~{Layout/layout :: navbar}"></nav>
+<main class="page-wrap">
+    <header class="page-heading"><p class="eyebrow">Control y trazabilidad</p><h1>Auditoría</h1>
+        <p>Consulta quién realizó cada acción, en qué fecha y sobre qué registro. Se muestran los 500 eventos más recientes.</p></header>
+    <section class="table-card">
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Actor</th><th>Acción</th><th>Registro afectado</th></tr></thead>
+            <tbody><tr th:each="evento : ${eventos}"><td th:text="${evento.fecha}"></td>
+                <td><span th:text="${evento.usuario.nombre}"></span><small class="table-subtext" th:text="${evento.usuario.correo}"></small></td>
+                <td th:text="${evento.accion}"></td><td th:text="${evento.entidad}"></td></tr>
+                <tr th:if="${#lists.isEmpty(eventos)}"><td class="empty-state" colspan="4">Aún no hay eventos auditados.</td></tr></tbody>
+        </table></div>
+    </section>
+</main>
+<footer th:replace="~{Layout/layout :: footer}"></footer>
+</body>
+</html>
