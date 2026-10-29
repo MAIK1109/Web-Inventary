@@ -3,15 +3,24 @@
 <head th:replace="~{Layout/layout :: head('Mis aportes')}"></head>
 <body>
 <nav th:replace="~{Layout/layout :: navbar}"></nav>
-<main class="page-wrap">
+<main class="page-wrap contributions-page">
     <header class="page-heading"><p class="eyebrow">Capital</p><h1>Mis aportes</h1>
-        <p>Registra un aporte para que el superadministrador lo revise. Solo los aprobados cuentan como capital.</p></header>
+        <p th:if="${!esSuperadmin}">Registra un aporte para que el superadministrador lo revise. Solo los aprobados cuentan como capital.</p>
+        <p th:if="${esSuperadmin}">Registra aportes directamente; se sumarán al capital aprobado sin revisión adicional.</p></header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
-    <section class="table-card">
-        <div class="table-top"><div><h2>Registrar aporte</h2><p>El aporte quedará pendiente hasta su revisión.</p></div>
-            <strong th:text="|Capital aprobado: ${totalUsuario}|">Capital aprobado: 0</strong></div>
-        <form th:action="@{/aportes/mi-cuenta}" th:object="${formAporte}" method="post" enctype="multipart/form-data" class="form-grid">
+
+    <section class="contribution-summary" aria-label="Capital aprobado">
+        <span class="contribution-summary-icon" aria-hidden="true">$</span>
+        <div><p class="eyebrow">Capital aprobado</p><strong th:text="${totalUsuario}">0</strong>
+            <span>Este valor incluye únicamente aportes aprobados.</span></div>
+    </section>
+
+    <section class="table-card contribution-card">
+        <div class="table-top"><div><h2>Registrar aporte</h2>
+            <p th:if="${!esSuperadmin}">Completa los datos y envíalo para revisión.</p>
+            <p th:if="${esSuperadmin}">Completa los datos para registrar el aporte directamente.</p></div></div>
+        <form th:action="@{/aportes/mi-cuenta}" th:object="${formAporte}" method="post" enctype="multipart/form-data" class="form-grid contribution-form">
             <div class="field"><label for="monto">Monto</label><input id="monto" type="number" th:field="*{monto}" min="1" step="1" required>
                 <small class="field-error" th:errors="*{monto}"></small></div>
             <div class="field"><label for="fecha">Fecha del aporte</label><input id="fecha" type="date" th:field="*{fecha}" required>
@@ -22,16 +31,17 @@
             <div class="field"><label for="soporte">Soporte <span class="field-hint">Opcional · PDF, PNG o JPG, máximo 5 MB</span></label>
                 <input id="soporte" type="file" th:field="*{soporte}" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg">
                 <small class="field-error" th:if="${#fields.hasGlobalErrors()}" th:each="error : ${#fields.globalErrors()}" th:text="${error}"></small></div>
-            <div class="form-actions"><button class="button button-primary" type="submit">Enviar para aprobación</button></div>
+            <div class="form-actions contribution-actions"><button class="button button-primary" type="submit"
+                    th:text="${esSuperadmin ? 'Registrar aporte' : 'Enviar para aprobación'}">Enviar para aprobación</button></div>
         </form>
     </section>
-    <section class="table-card">
-        <div class="table-top"><div><h2>Historial</h2><p>Los aportes pendientes o rechazados no se suman al capital.</p></div></div>
+    <section class="table-card contribution-card contribution-history">
+        <div class="table-top"><div><h2>Historial de aportes</h2><p>Consulta el estado de cada aporte que has registrado.</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Monto</th><th>Medio de pago</th><th>Soporte</th><th>Estado</th></tr></thead>
-            <tbody><tr th:each="aporte : ${aportes}"><td th:text="${aporte.fecha}"></td><td th:text="${aporte.monto}"></td><td th:text="${aporte.medioPago}"></td>
-                <td><a th:if="${aporte.soporteArchivo != null}" th:href="@{/aportes/mi-cuenta/{id}/soporte(id=${aporte.idInversion})}">Ver soporte</a><span th:if="${aporte.soporteArchivo == null}">—</span></td>
-                <td th:text="${aporte.estado == 0 ? 'PENDIENTE' : (aporte.estado == 1 ? 'APROBADO' : 'RECHAZADO')}"></td></tr>
-            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state" colspan="5">Aún no has registrado aportes.</td></tr></tbody>
+            <tbody><tr th:each="aporte : ${aportes}"><td th:text="${aporte.fecha}"></td><td class="contribution-amount" th:text="${aporte.monto}"></td><td th:text="${aporte.medioPago}"></td>
+                <td><a class="contribution-support-link" th:if="${aporte.soporteArchivo != null}" th:href="@{/aportes/mi-cuenta/{id}/soporte(id=${aporte.idInversion})}">Ver soporte</a><span th:if="${aporte.soporteArchivo == null}">—</span></td>
+                <td><span class="status-pill" th:classappend="${aporte.estado == 0 ? ' status-pending' : (aporte.estado == 1 ? ' status-active' : ' status-blocked')}" th:text="${aporte.estado == 0 ? 'PENDIENTE' : (aporte.estado == 1 ? 'APROBADO' : 'RECHAZADO')}"></span></td></tr>
+            <tr th:if="${#lists.isEmpty(aportes)}"><td class="empty-state contribution-empty" colspan="5"><strong>Aún no tienes aportes registrados</strong><span>Cuando envíes uno, podrás consultar aquí su estado.</span></td></tr></tbody>
         </table></div>
     </section>
 </main>

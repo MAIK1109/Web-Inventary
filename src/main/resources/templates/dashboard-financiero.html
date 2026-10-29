@@ -8,14 +8,15 @@
         <p>Resumen estimado de ventas confirmadas, costo de mercancía, gastos y utilidad para el período seleccionado.</p></header>
     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}" role="status"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
-    <section class="table-card">
-        <form method="get" th:action="@{/dashboard/financiero}" class="form-grid">
-            <label>Desde<input type="date" name="desde" th:value="${desde}" required></label>
-            <label>Hasta<input type="date" name="hasta" th:value="${hasta}" required></label>
-            <button class="button button-primary" type="submit">Actualizar período</button>
+    <section class="form-card dashboard-filter-card">
+        <div class="dashboard-panel-heading"><h2>Período de consulta</h2><p>Elige las fechas para recalcular los indicadores financieros.</p></div>
+        <form method="get" th:action="@{/dashboard/financiero}" class="dashboard-filter-form">
+            <div class="field"><label for="financiero-desde">Desde</label><input id="financiero-desde" type="date" name="desde" th:value="${desde}" required></div>
+            <div class="field"><label for="financiero-hasta">Hasta</label><input id="financiero-hasta" type="date" name="hasta" th:value="${hasta}" required></div>
+            <div class="dashboard-filter-action"><button class="button button-primary" type="submit">Actualizar período</button></div>
         </form>
     </section>
-    <section class="action-grid" style="margin:20px 0">
+    <section class="dashboard-stats-grid dashboard-stats-3 dashboard-section">
         <article class="info-card"><p class="eyebrow">Ventas netas</p><h2 th:text="${resumen.ventasNetas}">0</h2><p>Ventas confirmadas del período</p></article>
         <article class="info-card"><p class="eyebrow">Costo de mercancía vendida</p><h2 th:text="${resumen.costoMercanciaVendida}">0</h2><p>Costo histórico o última compra previa</p></article>
         <article class="info-card"><p class="eyebrow">Utilidad bruta</p><h2 th:text="${resumen.utilidadBruta}">0</h2><p>Ventas netas menos costo de mercancía</p></article>
@@ -23,9 +24,9 @@
         <article class="info-card"><p class="eyebrow">Utilidad neta estimada</p><h2 th:text="${resumen.utilidadNetaEstimada}">0</h2><p>Utilidad bruta menos gastos registrados</p></article>
         <article class="info-card"><p class="eyebrow">Margen neto estimado</p><h2 th:text="|${#numbers.formatDecimal(resumen.margenNetoPorcentaje, 1, 2)}%|">0%</h2><p>Utilidad neta sobre ventas netas</p></article>
     </section>
-    <div th:if="${resumen.lineasSinCosto > 0}" class="alert alert-info" role="note"
+    <div th:if="${resumen.lineasSinCosto > 0}" class="alert alert-info dashboard-note" role="note"
          th:text="|Estimación: ${resumen.lineasSinCosto} detalle(s) no tienen costo histórico ni compra previa. Se excluyen del costo de mercancía, por lo que la utilidad puede aparecer mayor que la real.|"></div>
-    <section class="table-card">
+    <section class="table-card dashboard-section">
         <div class="table-top"><div><h2>Evolución mensual</h2><p>Ventas, costo, gastos y utilidad neta estimada para cada mes del período.</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Mes</th><th>Ventas netas</th><th>Costo mercancía</th><th>Gastos</th><th>Utilidad neta estimada</th></tr></thead>
             <tbody><tr th:each="mes : ${resumen.evolucionMensual}"><td th:text="${mes.mes}"></td><td th:text="${mes.ventasNetas}"></td>
@@ -33,9 +34,9 @@
                 <tr th:if="${#lists.isEmpty(resumen.evolucionMensual)}"><td class="empty-state" colspan="5">No hay datos para este período.</td></tr></tbody>
         </table></div>
     </section>
-    <section class="table-card" style="margin-top:20px">
-        <div class="table-top"><div><h2>Registrar gasto</h2><p>Los gastos se incluyen en la utilidad neta estimada según su fecha.</p></div></div>
-        <form th:action="@{/dashboard/financiero/gastos}" th:object="${gasto}" method="post" enctype="multipart/form-data" class="form-grid">
+    <section class="form-card dashboard-expense-card dashboard-section">
+        <div class="dashboard-panel-heading"><h2>Registrar gasto</h2><p>Los gastos se incluyen en la utilidad neta estimada según su fecha.</p></div>
+        <form th:action="@{/dashboard/financiero/gastos}" th:object="${gasto}" method="post" enctype="multipart/form-data" class="form-grid dashboard-expense-form">
             <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" role="alert"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p></div>
             <input type="hidden" name="desde" th:value="${desde}"><input type="hidden" name="hasta" th:value="${hasta}">
             <div class="field"><label for="monto">Valor</label><input id="monto" type="number" min="1" step="1" th:field="*{monto}" required><small class="field-error" th:errors="*{monto}"></small></div>
@@ -48,7 +49,7 @@
             <div class="form-actions"><button class="button button-primary" type="submit">Guardar gasto</button></div>
         </form>
     </section>
-    <section class="table-card" style="margin-top:20px">
+    <section class="table-card dashboard-section">
         <div class="table-top"><div><h2>Gastos del período</h2><p>Registro de egresos incluidos en el cálculo.</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th><th>Comprobante</th><th>Registrado por</th><th>Estado</th></tr></thead>
             <tbody><tr th:each="gastoItem : ${resumen.gastosDetalle}"><td th:text="${gastoItem.idGasto}"></td><td th:text="${gastoItem.fecha}"></td><td th:text="${gastoItem.concepto}"></td>
@@ -58,7 +59,7 @@
                 <tr th:if="${#lists.isEmpty(resumen.gastosDetalle)}"><td class="empty-state" colspan="8">No hay gastos registrados en este período.</td></tr></tbody>
         </table></div>
     </section>
-    <p class="field-hint" style="margin-top:16px">Los importes usan las unidades monetarias del sistema. “Ventas netas” representa ventas confirmadas; descuentos, devoluciones e impuestos no se restan porque no están registrados en el modelo. El margen es neto estimado.</p>
+    <p class="field-hint dashboard-disclaimer">Los importes usan las unidades monetarias del sistema. “Ventas netas” representa ventas confirmadas; descuentos, devoluciones e impuestos no se restan porque no están registrados en el modelo. El margen es neto estimado.</p>
 </main>
 <footer th:replace="~{Layout/layout :: footer}"></footer>
 </body>

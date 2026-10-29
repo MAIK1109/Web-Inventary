@@ -63,21 +63,36 @@ public class AportesService {
     @Transactional
     public void registrar(Integer usuarioId, Integer monto, LocalDate fecha,
                           String medioPago, MultipartFile soporte) {
+        registrar(usuarioId, monto, fecha, medioPago, soporte, true, null);
+    }
+
+    @Transactional
+    public void registrar(Integer usuarioId, Integer monto, LocalDate fecha,
+                          String medioPago, MultipartFile soporte,
+                          boolean requiereAprobacion, String aprobador) {
         if (monto == null || monto <= 0) throw new IllegalArgumentException("El monto del aporte debe ser mayor que cero.");
         if (fecha == null) throw new IllegalArgumentException("La fecha del aporte es obligatoria.");
         if (medioPago == null || medioPago.isBlank() || medioPago.length() > 45) {
             throw new IllegalArgumentException("Selecciona un medio de pago válido.");
+        }
+        if (!requiereAprobacion && (aprobador == null || aprobador.isBlank())) {
+            throw new IllegalArgumentException("Se requiere identificar al superadministrador que registra el aporte.");
         }
         UsuariosEntity usuario = usuarios.findById(usuarioId)
                 .orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
         String archivo = soporteStorage.guardar(soporte);
         try {
             InversionesEntity aporte = new InversionesEntity(null, monto, fecha, medioPago.trim(),
-                    PENDIENTE, null, usuario);
+                    requiereAprobacion ? PENDIENTE : APROBADO, requiereAprobacion ? null : aprobador, usuario);
             aporte.setSoporteArchivo(archivo);
             inversiones.saveAndFlush(aporte);
             auditoria.registrar("REGISTRO_APORTE", "APORTE#" + aporte.getIdInversion(), usuarioId);
-            correoEventos.avisarNuevoAporte(aporte);
+            if (requiereAprobacion) {
+                correoEventos.avisarNuevoAporte(aporte);
+            } else {
+                auditoria.registrar("APROBACION_APORTE",
+                        "APORTE#" + aporte.getIdInversion() + ":APROBADO", usuarioId);
+            }
         } catch (RuntimeException ex) {
             soporteStorage.eliminar(archivo);
             throw ex;

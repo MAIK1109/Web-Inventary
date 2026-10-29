@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Objects;
+
 @Controller
 @RequestMapping("/aportes/mi-cuenta")
 public class MisAportesController {
@@ -43,10 +45,15 @@ public class MisAportesController {
             return "aportes";
         }
         model.addAttribute("aportes", aportes.listarUsuario(principal.getIdUsuario()));
+        boolean esSuperadmin = principal.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals("ROLE_SUPERADMIN", authority.getAuthority()));
         try {
             aportes.registrar(principal.getIdUsuario(), form.getMonto(), form.getFecha(),
-                    form.getMedioPago(), form.getSoporte());
-            redirect.addFlashAttribute("mensaje", "El aporte quedó pendiente de aprobación.");
+                    form.getMedioPago(), form.getSoporte(), !esSuperadmin,
+                    esSuperadmin ? principal.getUsername() : null);
+            redirect.addFlashAttribute("mensaje", esSuperadmin
+                    ? "El aporte se registró y se sumó al capital aprobado."
+                    : "El aporte quedó pendiente de aprobación.");
         } catch (IllegalArgumentException ex) {
             binding.reject("aporte.invalido", ex.getMessage());
             preparar(principal, model);
@@ -71,5 +78,7 @@ public class MisAportesController {
     private void preparar(CuentaUserDetails principal, Model model) {
         model.addAttribute("aportes", aportes.listarUsuario(principal.getIdUsuario()));
         model.addAttribute("totalUsuario", aportes.totalUsuario(principal.getIdUsuario()));
+        model.addAttribute("esSuperadmin", principal.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals("ROLE_SUPERADMIN", authority.getAuthority())));
     }
 }

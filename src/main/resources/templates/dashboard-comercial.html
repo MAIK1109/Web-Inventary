@@ -6,30 +6,31 @@
 <main class="page-wrap">
     <header class="page-heading"><p class="eyebrow">Análisis de ventas</p><h1>Dashboard comercial</h1>
         <p>Consulta el rendimiento de ventas y las preferencias de compra para el período seleccionado.</p></header>
-    <section class="table-card">
-        <form method="get" th:action="@{/dashboard/comercial}" class="form-grid">
-            <label>Desde<input type="date" name="desde" th:value="${resumen.desde}" required></label>
-            <label>Hasta<input type="date" name="hasta" th:value="${resumen.hasta}" required></label>
-            <button class="button button-primary" type="submit">Actualizar período</button>
+    <section class="form-card dashboard-filter-card">
+        <div class="dashboard-panel-heading"><h2>Período de consulta</h2><p>Elige las fechas para actualizar los indicadores.</p></div>
+        <form method="get" th:action="@{/dashboard/comercial}" class="dashboard-filter-form">
+            <div class="field"><label for="comercial-desde">Desde</label><input id="comercial-desde" type="date" name="desde" th:value="${resumen.desde}" required></div>
+            <div class="field"><label for="comercial-hasta">Hasta</label><input id="comercial-hasta" type="date" name="hasta" th:value="${resumen.hasta}" required></div>
+            <div class="dashboard-filter-action"><button class="button button-primary" type="submit">Actualizar período</button></div>
         </form>
     </section>
-    <section class="action-grid" style="margin: 20px 0">
+    <section class="dashboard-stats-grid dashboard-stats-2 dashboard-section">
         <article class="info-card"><p class="eyebrow">Ventas</p><h2 th:text="${resumen.cantidadVentas}">0</h2><p>Operaciones en el período</p></article>
         <article class="info-card"><p class="eyebrow">Ingresos</p><h2 th:text="${resumen.totalVentas}">0</h2><p>Total vendido</p></article>
     </section>
-    <section class="table-card">
+    <section class="table-card dashboard-section">
         <div class="table-top"><div><h2>Ventas por fecha</h2><p>Importe vendido por día</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Fecha</th><th>Total vendido</th></tr></thead><tbody>
             <tr th:each="fila : ${resumen.ventasPorFecha}"><td th:text="${fila.key}"></td><td th:text="${fila.value}"></td></tr>
             <tr th:if="${#maps.isEmpty(resumen.ventasPorFecha)}"><td class="empty-state" colspan="2">No hay ventas en este período.</td></tr>
         </tbody></table></div>
     </section>
-    <section class="action-grid" style="margin-top: 20px">
-        <article class="table-card"><h2>Productos más vendidos</h2><ol><li th:each="item : ${resumen.productosMasVendidos}" th:text="|${item.nombre}: ${item.valor} unidades|"></li></ol><p th:if="${#lists.isEmpty(resumen.productosMasVendidos)}">Sin datos para este período.</p></article>
-        <article class="table-card"><h2>Vendedores con mayores ventas</h2><ol><li th:each="item : ${resumen.vendedoresTop}" th:text="|${item.nombre}: ${item.valor}|"></li></ol><p th:if="${#lists.isEmpty(resumen.vendedoresTop)}">Las ventas aún no tienen vendedor asignado.</p></article>
-        <article class="table-card"><h2>Clientes de mayor gasto</h2><ol><li th:each="item : ${resumen.clientesTop}" th:text="|${item.nombre}: ${item.valor}|"></li></ol><p th:if="${#lists.isEmpty(resumen.clientesTop)}">Sin datos para este período.</p></article>
+    <section class="dashboard-card-grid dashboard-card-grid-3 dashboard-section">
+        <article class="table-card dashboard-ranking-card"><div class="table-top"><div><h2>Productos más vendidos</h2><p>Unidades por producto</p></div></div><ol class="dashboard-list"><li th:each="item : ${resumen.productosMasVendidos}" th:text="|${item.nombre}: ${item.valor} unidades|"></li></ol><p class="dashboard-empty" th:if="${#lists.isEmpty(resumen.productosMasVendidos)}">Sin datos para este período.</p></article>
+        <article class="table-card dashboard-ranking-card"><div class="table-top"><div><h2>Vendedores con mayores ventas</h2><p>Ingresos en el período</p></div></div><ol class="dashboard-list"><li th:each="item : ${resumen.vendedoresTop}" th:text="|${item.nombre}: ${item.valor}|"></li></ol><p class="dashboard-empty" th:if="${#lists.isEmpty(resumen.vendedoresTop)}">Las ventas aún no tienen vendedor asignado.</p></article>
+        <article class="table-card dashboard-ranking-card"><div class="table-top"><div><h2>Clientes de mayor gasto</h2><p>Total comprado por cliente</p></div></div><ol class="dashboard-list"><li th:each="item : ${resumen.clientesTop}" th:text="|${item.nombre}: ${item.valor}|"></li></ol><p class="dashboard-empty" th:if="${#lists.isEmpty(resumen.clientesTop)}">Sin datos para este período.</p></article>
     </section>
-    <section class="table-card" style="margin-top: 20px">
+    <section class="table-card dashboard-section">
         <div class="table-top"><div><h2>Producto más comprado por cliente</h2><p>Unidades acumuladas durante el período</p></div></div>
         <div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Producto preferido</th></tr></thead><tbody>
             <tr th:each="fila : ${resumen.productoMasCompradoPorCliente}"><td th:text="${fila.key}"></td><td th:text="${fila.value}"></td></tr>
