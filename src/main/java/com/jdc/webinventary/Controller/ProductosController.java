@@ -3,8 +3,10 @@ package com.jdc.webinventary.Controller;
 import com.jdc.webinventary.dto.ProductoForm;
 import com.jdc.webinventary.entity.ProductosEntity;
 import com.jdc.webinventary.service.ProductosService;
+import com.jdc.webinventary.security.CuentaUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +34,8 @@ public class ProductosController {
 
     @PostMapping
     public String crear(@Valid @ModelAttribute("producto") ProductoForm form,
-                        BindingResult binding, Model model, RedirectAttributes redirect) {
+                        BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
+                        Model model, RedirectAttributes redirect) {
         if (!binding.hasErrors() && productos.codigoRegistrado(form.getCodigo(), null)) {
             binding.rejectValue("codigo", "codigo.duplicado", "Ya existe un producto con ese código.");
         }
@@ -41,7 +44,7 @@ public class ProductosController {
             return "productos";
         }
         try {
-            productos.crear(form);
+            productos.crear(form, principal.getIdUsuario());
         } catch (ProductosService.CodigoDuplicadoException ex) {
             binding.rejectValue("codigo", "codigo.duplicado", ex.getMessage());
             prepararVista(model, null);
@@ -62,7 +65,8 @@ public class ProductosController {
     @PostMapping("/{id}")
     public String actualizar(@PathVariable Integer id,
                              @Valid @ModelAttribute("producto") ProductoForm form,
-                             BindingResult binding, Model model, RedirectAttributes redirect) {
+                             BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
+                             Model model, RedirectAttributes redirect) {
         productos.obtener(id);
         if (!binding.hasErrors() && productos.codigoRegistrado(form.getCodigo(), id)) {
             binding.rejectValue("codigo", "codigo.duplicado", "Ya existe otro producto con ese código.");
@@ -72,7 +76,7 @@ public class ProductosController {
             return "productos";
         }
         try {
-            productos.actualizar(id, form);
+            productos.actualizar(id, form, principal.getIdUsuario());
         } catch (ProductosService.CodigoDuplicadoException ex) {
             binding.rejectValue("codigo", "codigo.duplicado", ex.getMessage());
             prepararVista(model, id);

@@ -29,6 +29,7 @@ public class RegistroVentaService {
     private final EntityManager entityManager;
     private final ComprasRepository comprasRepository;
     private final CorreoEventosService correoEventos;
+    private final AuditoriaService auditoria;
 
     public RegistroVentaService(ClientesRepository clientesRepository,
                                 ProductosRepository productosRepository,
@@ -38,7 +39,7 @@ public class RegistroVentaService {
                                 EstadoAlertaInventarioService estadoAlertas,
                                 EntityManager entityManager,
                                 ComprasRepository comprasRepository,
-                                CorreoEventosService correoEventos) {
+                                CorreoEventosService correoEventos, AuditoriaService auditoria) {
         this.clientesRepository = clientesRepository;
         this.productosRepository = productosRepository;
         this.ventasRepository = ventasRepository;
@@ -48,6 +49,7 @@ public class RegistroVentaService {
         this.entityManager = entityManager;
         this.comprasRepository = comprasRepository;
         this.correoEventos = correoEventos;
+        this.auditoria = auditoria;
     }
 
     @Transactional
@@ -127,6 +129,7 @@ public class RegistroVentaService {
                     "VENTA-" + guardada.getIdVenta(), guardada.getFecha(),
                     guardada.getVendedor(), detalle.getProducto()));
         }
+        auditoria.registrar("VENTA_CONFIRMADA", "VENTA#" + guardada.getIdVenta(), vendedorId);
         correoEventos.enviarComprobanteVenta(guardada);
         return guardada;
     }

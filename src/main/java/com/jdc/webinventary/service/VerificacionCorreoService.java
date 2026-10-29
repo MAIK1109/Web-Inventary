@@ -27,6 +27,7 @@ public class VerificacionCorreoService {
     private static final Logger log = LoggerFactory.getLogger(VerificacionCorreoService.class);
     private static final int VIGENCIA_HORAS = 24;
     private final UsuariosRepository usuarios;
+    private final AuditoriaService auditoria;
     private final TokenVerificacionRepository tokens;
     private final ObjectProvider<JavaMailSender> mailSender;
     private final String baseUrl;
@@ -36,8 +37,10 @@ public class VerificacionCorreoService {
     public VerificacionCorreoService(UsuariosRepository usuarios, TokenVerificacionRepository tokens,
                                      ObjectProvider<JavaMailSender> mailSender,
                                      @Value("${app.security.email-verification-base-url:http://localhost:8086}") String baseUrl,
-                                     @Value("${spring.mail.username:}") String remitente) {
+                                     @Value("${spring.mail.username:}") String remitente,
+                                     AuditoriaService auditoria) {
         this.usuarios = usuarios;
+        this.auditoria = auditoria;
         this.tokens = tokens;
         this.mailSender = mailSender;
         this.baseUrl = baseUrl.replaceAll("/$", "");
@@ -83,6 +86,7 @@ public class VerificacionCorreoService {
         UsuariosEntity usuario = token.getUsuario();
         usuario.setVerificado("SI");
         usuarios.save(usuario);
+        auditoria.registrar("VERIFICACION_CORREO", "USUARIO#" + usuario.getIdUsuario(), usuario.getIdUsuario());
         return true;
     }
 

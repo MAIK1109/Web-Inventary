@@ -2,8 +2,10 @@ package com.jdc.webinventary.Controller;
 
 import com.jdc.webinventary.dto.RegistroProveedorForm;
 import com.jdc.webinventary.service.RegistroProveedorService;
+import com.jdc.webinventary.security.CuentaUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +32,8 @@ public class ProveedoresController {
 
     @PostMapping
     public String registrar(@Valid @ModelAttribute("proveedor") RegistroProveedorForm form,
-                            BindingResult binding, Model model, RedirectAttributes redirect) {
+                            BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
+                            Model model, RedirectAttributes redirect) {
         if (!binding.hasErrors() && registroProveedor.identificacionRegistrada(form.getIdentificacion())) {
             binding.rejectValue("identificacion", "identificacion.duplicada",
                     "Ya existe un proveedor con esa identificación.");
@@ -40,7 +43,7 @@ public class ProveedoresController {
             return "proveedores";
         }
         try {
-            registroProveedor.registrar(form);
+            registroProveedor.registrar(form, principal.getIdUsuario());
         } catch (RegistroProveedorService.IdentificacionDuplicadaException ex) {
             binding.rejectValue("identificacion", "identificacion.duplicada", ex.getMessage());
             model.addAttribute("proveedores", registroProveedor.listar());

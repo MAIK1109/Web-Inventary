@@ -20,15 +20,17 @@ public class DashboardFinancieroService {
     private final GastosRepository gastos;
     private final UsuariosRepository usuarios;
     private final GastoComprobanteStorageService comprobantes;
+    private final AuditoriaService auditoria;
 
     public DashboardFinancieroService(VentasRepository ventas, ComprasRepository compras,
                                       GastosRepository gastos, UsuariosRepository usuarios,
-                                      GastoComprobanteStorageService comprobantes) {
+                                      GastoComprobanteStorageService comprobantes, AuditoriaService auditoria) {
         this.ventas = ventas;
         this.compras = compras;
         this.gastos = gastos;
         this.usuarios = usuarios;
         this.comprobantes = comprobantes;
+        this.auditoria = auditoria;
     }
 
     @Transactional(readOnly = true)
@@ -114,6 +116,7 @@ public class DashboardFinancieroService {
                     form.getCategoria().trim(), usuario);
             gasto.setComprobanteArchivo(comprobante);
             gastos.saveAndFlush(gasto);
+            auditoria.registrar("REGISTRO_GASTO", "GASTO#" + gasto.getIdGasto(), usuarioId);
         } catch (RuntimeException ex) {
             comprobantes.eliminar(comprobante);
             throw ex;

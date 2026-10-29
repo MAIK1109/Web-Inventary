@@ -37,6 +37,7 @@
                 <a th:if="${isSuperadmin}" th:href="@{/admin/usuarios}">Usuarios</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/aportes}">Aportes</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/anulaciones}">Anulaciones</a>
+                <a th:if="${isSuperadmin}" th:href="@{/admin/auditoria}">Auditoría</a>
                 <a th:if="${isLoggedIn}" th:href="@{/cuenta}">Mi cuenta</a>
                 <a th:if="${isLoggedIn}" th:href="@{/aportes/mi-cuenta}">Mis aportes</a>
                 <a th:if="${!isLoggedIn}" th:href="@{/registro}">Crear cuenta</a>

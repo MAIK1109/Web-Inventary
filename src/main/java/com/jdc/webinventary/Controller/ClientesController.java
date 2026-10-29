@@ -2,8 +2,10 @@ package com.jdc.webinventary.Controller;
 
 import com.jdc.webinventary.dto.RegistroClienteForm;
 import com.jdc.webinventary.service.RegistroClienteService;
+import com.jdc.webinventary.security.CuentaUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,7 @@ public class ClientesController {
     @PostMapping
     public String registrar(@Valid @ModelAttribute("cliente") RegistroClienteForm form,
                             BindingResult bindingResult,
+                            @AuthenticationPrincipal CuentaUserDetails principal,
                             Model model,
                             RedirectAttributes redirectAttributes) {
         if (form.isConsentimientoComprobantes()
@@ -51,7 +54,7 @@ public class ClientesController {
         }
 
         try {
-            registroClienteService.registrar(form);
+            registroClienteService.registrar(form, principal.getIdUsuario());
         } catch (RegistroClienteService.IdentificacionDuplicadaException ex) {
             bindingResult.rejectValue("identificacion", "identificacion.duplicada", ex.getMessage());
             model.addAttribute("clientes", registroClienteService.listar());

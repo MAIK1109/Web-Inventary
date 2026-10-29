@@ -14,9 +14,11 @@ import java.util.Locale;
 @Service
 public class ProductosService {
     private final ProductosRepository productos;
+    private final AuditoriaService auditoria;
 
-    public ProductosService(ProductosRepository productos) {
+    public ProductosService(ProductosRepository productos, AuditoriaService auditoria) {
         this.productos = productos;
+        this.auditoria = auditoria;
     }
 
     @Transactional(readOnly = true)
@@ -38,18 +40,20 @@ public class ProductosService {
     }
 
     @Transactional
-    public void crear(ProductoForm form) {
+    public void crear(ProductoForm form, Integer actorId) {
         ProductosEntity producto = new ProductosEntity();
         actualizarDatos(producto, form);
         producto.setStockActual(0);
         guardar(producto);
+        auditoria.registrar("CREACION_PRODUCTO", "PRODUCTO#" + producto.getIdProducto() + ":" + producto.getCodigo(), actorId);
     }
 
     @Transactional
-    public void actualizar(Integer id, ProductoForm form) {
+    public void actualizar(Integer id, ProductoForm form, Integer actorId) {
         ProductosEntity producto = obtener(id);
         actualizarDatos(producto, form);
         guardar(producto);
+        auditoria.registrar("ACTUALIZACION_PRODUCTO", "PRODUCTO#" + id + ":" + producto.getCodigo(), actorId);
     }
 
     private void actualizarDatos(ProductosEntity producto, ProductoForm form) {

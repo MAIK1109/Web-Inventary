@@ -14,9 +14,11 @@ import java.util.Locale;
 public class RegistroClienteService {
 
     private final ClientesRepository clientesRepository;
+    private final AuditoriaService auditoria;
 
-    public RegistroClienteService(ClientesRepository clientesRepository) {
+    public RegistroClienteService(ClientesRepository clientesRepository, AuditoriaService auditoria) {
         this.clientesRepository = clientesRepository;
+        this.auditoria = auditoria;
     }
 
     public boolean identificacionRegistrada(String identificacion) {
@@ -26,7 +28,7 @@ public class RegistroClienteService {
     public java.util.List<ClientesEntity> listar() { return clientesRepository.findAll(); }
 
     @Transactional
-    public void registrar(RegistroClienteForm form) {
+    public void registrar(RegistroClienteForm form, Integer actorId) {
         ClientesEntity cliente = new ClientesEntity();
         cliente.setIdentificacion(form.getIdentificacion().trim().toUpperCase(Locale.ROOT));
         cliente.setNombre(form.getNombre().trim());
@@ -42,6 +44,7 @@ public class RegistroClienteService {
         } catch (DataIntegrityViolationException ex) {
             throw new IdentificacionDuplicadaException();
         }
+        auditoria.registrar("CREACION_CLIENTE", "CLIENTE#" + cliente.getIdCliente(), actorId);
     }
 
     public static class IdentificacionDuplicadaException extends RuntimeException {

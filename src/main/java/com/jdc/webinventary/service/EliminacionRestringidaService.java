@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Service
 public class EliminacionRestringidaService {
     private final AnulacionesRepository anulaciones;
-    private final AuditoriasRepository auditorias;
+    private final AuditoriaService auditoria;
     private final ComprasRepository compras;
     private final VentasRepository ventas;
     private final ProductosRepository productos;
@@ -25,13 +25,13 @@ public class EliminacionRestringidaService {
     private final UsuariosRepository usuarios;
     private final EstadoAlertaInventarioService estadoAlertas;
 
-    public EliminacionRestringidaService(AnulacionesRepository anulaciones, AuditoriasRepository auditorias,
+    public EliminacionRestringidaService(AnulacionesRepository anulaciones, AuditoriaService auditoria,
             ComprasRepository compras, VentasRepository ventas, ProductosRepository productos,
             ClientesRepository clientes, ProveedoresRepository proveedores, GastosRepository gastos,
             InversionesRepository inversiones, MovimientosInventariosRepository movimientos,
             EstadoAlertaInventarioRepository estadosAlerta, CambioAlertaInventarioRepository cambiosAlerta,
             UsuariosRepository usuarios, EstadoAlertaInventarioService estadoAlertas) {
-        this.anulaciones = anulaciones; this.auditorias = auditorias; this.compras = compras;
+        this.anulaciones = anulaciones; this.auditoria = auditoria; this.compras = compras;
         this.ventas = ventas; this.productos = productos; this.clientes = clientes;
         this.proveedores = proveedores; this.gastos = gastos; this.inversiones = inversiones;
         this.movimientos = movimientos; this.estadosAlerta = estadosAlerta;
@@ -106,6 +106,7 @@ public class EliminacionRestringidaService {
 
     private void registrar(String tipo, Integer id, String motivo, UsuariosEntity actor) {
         anulaciones.save(new AnulacionesEntity(tipo, id, LocalDateTime.now(), motivo, actor));
+        auditoria.registrar("ANULACION_" + tipo, tipo + "#" + id + ":ANULADA", actor.getIdUsuario());
     }
 
     private void comprobarActivo(Byte estado) {
@@ -124,24 +125,20 @@ public class EliminacionRestringidaService {
                         || movimientos.existsByProducto_IdProducto(id) || estadosAlerta.existsByProducto_IdProducto(id)
                         || cambiosAlerta.existsByProducto_IdProducto(id))
                     throw new IllegalArgumentException("El producto tiene movimientos o historial asociado y no se puede eliminar.");
-                auditar("PRODUCTO#" + id + ":" + p.getCodigo(), actor); productos.delete(p); productos.flush();
+                auditoria.registrar("ELIMINACION", "PRODUCTO#" + id + ":" + p.getCodigo(), usuarioId); productos.delete(p); productos.flush();
             }
             case "CLIENTE" -> {
                 ClientesEntity c = clientes.findById(id).orElseThrow(() -> noExiste("cliente"));
                 if (ventas.existsByCliente_IdCliente(id)) throw new IllegalArgumentException("El cliente tiene ventas asociadas y no se puede eliminar.");
-                auditar("CLIENTE#" + id + ":" + c.getIdentificacion(), actor); clientes.delete(c); clientes.flush();
+                auditoria.registrar("ELIMINACION", "CLIENTE#" + id + ":" + c.getIdentificacion(), usuarioId); clientes.delete(c); clientes.flush();
             }
             case "PROVEEDOR" -> {
                 ProveedoresEntity p = proveedores.findById(id).orElseThrow(() -> noExiste("proveedor"));
                 if (compras.existsByProveedor_IdProveedor(id)) throw new IllegalArgumentException("El proveedor tiene compras asociadas y no se puede eliminar.");
-                auditar("PROVEEDOR#" + id + ":" + p.getIdentificacion(), actor); proveedores.delete(p); proveedores.flush();
+                auditoria.registrar("ELIMINACION", "PROVEEDOR#" + id + ":" + p.getIdentificacion(), usuarioId); proveedores.delete(p); proveedores.flush();
             }
             default -> throw new IllegalArgumentException("Tipo de registro no permitido para eliminación.");
         }
     }
 
-    private void auditar(String entidad, UsuariosEntity actor) {
-        String referencia = entidad.length() > 45 ? entidad.substring(0, 45) : entidad;
-        auditorias.save(new AuditoriasEntity(null, "ELIMINACION", referencia, LocalDate.now(), actor));
-    }
 }

@@ -15,12 +15,14 @@ public class RegistroCuentaService {
     private final UsuariosRepository usuariosRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificacionCorreoService verificacionCorreo;
+    private final AuditoriaService auditoria;
 
     public RegistroCuentaService(UsuariosRepository usuariosRepository, PasswordEncoder passwordEncoder,
-                                 VerificacionCorreoService verificacionCorreo) {
+                                 VerificacionCorreoService verificacionCorreo, AuditoriaService auditoria) {
         this.usuariosRepository = usuariosRepository;
         this.passwordEncoder = passwordEncoder;
         this.verificacionCorreo = verificacionCorreo;
+        this.auditoria = auditoria;
     }
 
     public boolean correoYaRegistrado(String correo) {
@@ -44,6 +46,7 @@ public class RegistroCuentaService {
         } catch (DataIntegrityViolationException ex) {
             throw new CorreoDuplicadoException();
         }
+        auditoria.registrar("CREACION_CUENTA", "USUARIO#" + usuario.getIdUsuario(), usuario.getIdUsuario());
         verificacionCorreo.enviarEnlace(usuario);
     }
 

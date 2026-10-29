@@ -30,6 +30,7 @@ public class RecuperacionAccesoService {
     private final UsuariosRepository usuarios;
     private final TokenRecuperacionRepository tokens;
     private final PasswordEncoder passwordEncoder;
+    private final AuditoriaService auditoria;
     private final ObjectProvider<JavaMailSender> mailSender;
     private final String baseUrl;
     private final String remitente;
@@ -38,10 +39,12 @@ public class RecuperacionAccesoService {
     public RecuperacionAccesoService(UsuariosRepository usuarios, TokenRecuperacionRepository tokens,
                                      PasswordEncoder passwordEncoder, ObjectProvider<JavaMailSender> mailSender,
                                      @Value("${app.security.password-reset-base-url:http://localhost:8086}") String baseUrl,
-                                     @Value("${spring.mail.username:}") String remitente) {
+                                     @Value("${spring.mail.username:}") String remitente,
+                                     AuditoriaService auditoria) {
         this.usuarios = usuarios;
         this.tokens = tokens;
         this.passwordEncoder = passwordEncoder;
+        this.auditoria = auditoria;
         this.mailSender = mailSender;
         this.baseUrl = baseUrl.replaceAll("/$", "");
         this.remitente = remitente;
@@ -92,6 +95,7 @@ public class RecuperacionAccesoService {
         UsuariosEntity usuario = token.getUsuario();
         usuario.setHashPassword(passwordEncoder.encode(nuevaPassword));
         usuarios.save(usuario);
+        auditoria.registrar("CAMBIO_PASSWORD", "USUARIO#" + usuario.getIdUsuario(), usuario.getIdUsuario());
         return true;
     }
 

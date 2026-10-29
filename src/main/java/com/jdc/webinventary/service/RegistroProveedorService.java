@@ -14,8 +14,11 @@ import java.util.Locale;
 @Service
 public class RegistroProveedorService {
     private final ProveedoresRepository proveedores;
+    private final AuditoriaService auditoria;
 
-    public RegistroProveedorService(ProveedoresRepository proveedores) { this.proveedores = proveedores; }
+    public RegistroProveedorService(ProveedoresRepository proveedores, AuditoriaService auditoria) {
+        this.proveedores = proveedores; this.auditoria = auditoria;
+    }
 
     public List<ProveedoresEntity> listar() { return proveedores.findAll(Sort.by("nombre").ascending()); }
 
@@ -24,7 +27,7 @@ public class RegistroProveedorService {
     }
 
     @Transactional
-    public void registrar(RegistroProveedorForm form) {
+    public void registrar(RegistroProveedorForm form, Integer actorId) {
         ProveedoresEntity proveedor = new ProveedoresEntity();
         proveedor.setIdentificacion(form.getIdentificacion().trim().toUpperCase(Locale.ROOT));
         proveedor.setNombre(form.getRazonSocial().trim());
@@ -36,6 +39,7 @@ public class RegistroProveedorService {
         } catch (DataIntegrityViolationException ex) {
             throw new IdentificacionDuplicadaException();
         }
+        auditoria.registrar("CREACION_PROVEEDOR", "PROVEEDOR#" + proveedor.getIdProveedor(), actorId);
     }
 
     public static class IdentificacionDuplicadaException extends RuntimeException {

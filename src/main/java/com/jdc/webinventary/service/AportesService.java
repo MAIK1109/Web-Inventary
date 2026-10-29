@@ -23,13 +23,16 @@ public class AportesService {
     private final UsuariosRepository usuarios;
     private final AporteSoporteStorageService soporteStorage;
     private final CorreoEventosService correoEventos;
+    private final AuditoriaService auditoria;
 
     public AportesService(InversionesRepository inversiones, UsuariosRepository usuarios,
-                          AporteSoporteStorageService soporteStorage, CorreoEventosService correoEventos) {
+                          AporteSoporteStorageService soporteStorage, CorreoEventosService correoEventos,
+                          AuditoriaService auditoria) {
         this.inversiones = inversiones;
         this.usuarios = usuarios;
         this.soporteStorage = soporteStorage;
         this.correoEventos = correoEventos;
+        this.auditoria = auditoria;
     }
 
     public List<InversionesEntity> listarPendientes() {
@@ -73,6 +76,7 @@ public class AportesService {
                     PENDIENTE, null, usuario);
             aporte.setSoporteArchivo(archivo);
             inversiones.saveAndFlush(aporte);
+            auditoria.registrar("REGISTRO_APORTE", "APORTE#" + aporte.getIdInversion(), usuarioId);
             correoEventos.avisarNuevoAporte(aporte);
         } catch (RuntimeException ex) {
             soporteStorage.eliminar(archivo);
@@ -114,6 +118,10 @@ public class AportesService {
         if (actualizados == 0) {
             throw new AporteNoEncontradoException("El aporte no existe o ya fue revisado.");
         }
+        UsuariosEntity actor = usuarios.findByCorreoIgnoreCase(superadmin)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el actor de la aprobación."));
+        auditoria.registrar(aprobar ? "APROBACION_APORTE" : "RECHAZO_APORTE",
+                "APORTE#" + id + (aprobar ? ":APROBADO" : ":RECHAZADO"), actor.getIdUsuario());
         correoEventos.avisarResultadoAporte(aporte, aprobar);
     }
 

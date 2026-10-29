@@ -19,17 +19,19 @@ public class RegistroCompraService {
     private final UsuariosRepository usuarios;
     private final MovimientosInventariosRepository movimientos;
     private final EstadoAlertaInventarioService estadoAlertas;
+    private final AuditoriaService auditoria;
 
     public RegistroCompraService(ComprasRepository compras, ProveedoresRepository proveedores,
                                  ProductosRepository productos, UsuariosRepository usuarios,
                                  MovimientosInventariosRepository movimientos,
-                                 EstadoAlertaInventarioService estadoAlertas) {
+                                 EstadoAlertaInventarioService estadoAlertas, AuditoriaService auditoria) {
         this.compras = compras;
         this.proveedores = proveedores;
         this.productos = productos;
         this.usuarios = usuarios;
         this.movimientos = movimientos;
         this.estadoAlertas = estadoAlertas;
+        this.auditoria = auditoria;
     }
 
     public List<ComprasEntity> listar() { return compras.findAllByOrderByFechaDesc(); }
@@ -78,6 +80,7 @@ public class RegistroCompraService {
             movimientos.save(new MovimientosInventariosEntity(null, "ENTRADA_COMPRA", entrada.cantidad(),
                     "COMPRA-" + compra.getIdCompra(), form.getFecha(), usuario, entrada.producto()));
         }
+        auditoria.registrar("COMPRA_CONFIRMADA", "COMPRA#" + compra.getIdCompra(), usuarioId);
         return compra;
     }
 

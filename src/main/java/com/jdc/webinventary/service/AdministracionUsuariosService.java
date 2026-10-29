@@ -21,12 +21,14 @@ public class AdministracionUsuariosService {
     private final UsuariosRepository usuariosRepository;
     private final SessionRegistry sessionRegistry;
     private final VerificacionCorreoService verificacionCorreo;
+    private final AuditoriaService auditoria;
 
     public AdministracionUsuariosService(UsuariosRepository usuariosRepository, SessionRegistry sessionRegistry,
-                                         VerificacionCorreoService verificacionCorreo) {
+                                         VerificacionCorreoService verificacionCorreo, AuditoriaService auditoria) {
         this.usuariosRepository = usuariosRepository;
         this.sessionRegistry = sessionRegistry;
         this.verificacionCorreo = verificacionCorreo;
+        this.auditoria = auditoria;
     }
 
     public List<UsuariosEntity> listarUsuarios() {
@@ -55,6 +57,7 @@ public class AdministracionUsuariosService {
         } catch (DataIntegrityViolationException ex) {
             throw new CorreoDuplicadoException();
         }
+        auditoria.registrar("ACTUALIZACION_PERFIL", "USUARIO#" + idUsuario, idUsuario);
         if (cambiaCorreo) {
             expirarSesiones(idUsuario);
             verificacionCorreo.enviarEnlace(usuario);
@@ -62,7 +65,7 @@ public class AdministracionUsuariosService {
     }
 
     @Transactional
-    public void actualizarComoSuperadmin(Integer idUsuario, AdministrarCuentaForm form) {
+    public void actualizarComoSuperadmin(Integer idUsuario, AdministrarCuentaForm form, Integer actorId) {
         UsuariosEntity usuario = obtenerUsuario(idUsuario);
         String correo = normalizarCorreo(form.getCorreo());
         validarCorreoDisponible(correo, idUsuario);
@@ -86,6 +89,7 @@ public class AdministracionUsuariosService {
         } catch (DataIntegrityViolationException ex) {
             throw new CorreoDuplicadoException();
         }
+        auditoria.registrar("ACTUALIZACION_CUENTA", "USUARIO#" + idUsuario, actorId);
 
         if (cambiaRol || cambiaCorreo) {
             expirarSesiones(idUsuario);
@@ -94,16 +98,17 @@ public class AdministracionUsuariosService {
     }
 
     @Transactional
-    public void activar(Integer idUsuario) {
+    public void activar(Integer idUsuario, Integer actorId) {
         UsuariosEntity usuario = obtenerUsuario(idUsuario);
         protegerSuperadmin(usuario);
         usuario.setEstadoCuenta("ACTIVA");
         usuariosRepository.saveAndFlush(usuario);
+        auditoria.registrar("ACTIVACION_CUENTA", "USUARIO#" + idUsuario, actorId);
         expirarSesiones(idUsuario);
     }
 
     @Transactional
-    public void bloquear(Integer idUsuario, String correoActor) {
+    public void bloquear(Integer idUsuario, String correoActor, Integer actorId) {
         UsuariosEntity usuario = obtenerUsuario(idUsuario);
         protegerSuperadmin(usuario);
         if (usuario.getCorreo().equalsIgnoreCase(correoActor)) {
@@ -111,6 +116,7 @@ public class AdministracionUsuariosService {
         }
         usuario.setEstadoCuenta("BLOQUEADA");
         usuariosRepository.saveAndFlush(usuario);
+        auditoria.registrar("BLOQUEO_CUENTA", "USUARIO#" + idUsuario, actorId);
         expirarSesiones(idUsuario);
     }
 

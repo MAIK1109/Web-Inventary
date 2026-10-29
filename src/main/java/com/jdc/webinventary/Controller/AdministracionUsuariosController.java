@@ -3,9 +3,11 @@ package com.jdc.webinventary.Controller;
 import com.jdc.webinventary.dto.AdministrarCuentaForm;
 import com.jdc.webinventary.entity.UsuariosEntity;
 import com.jdc.webinventary.service.AdministracionUsuariosService;
+import com.jdc.webinventary.security.CuentaUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +52,7 @@ public class AdministracionUsuariosController {
     public String guardar(@PathVariable Integer id,
                           @Valid @ModelAttribute("cuenta") AdministrarCuentaForm form,
                           BindingResult bindingResult,
+                          @AuthenticationPrincipal CuentaUserDetails principal,
                           Model model,
                           RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
@@ -58,7 +61,7 @@ public class AdministracionUsuariosController {
             return "admin/usuario-form";
         }
         try {
-            administracion.actualizarComoSuperadmin(id, form);
+            administracion.actualizarComoSuperadmin(id, form, principal.getIdUsuario());
         } catch (AdministracionUsuariosService.CorreoDuplicadoException ex) {
             bindingResult.rejectValue("correo", "correo.duplicado", ex.getMessage());
             model.addAttribute("usuarioId", id);
@@ -75,9 +78,10 @@ public class AdministracionUsuariosController {
     }
 
     @PostMapping("/{id}/activar")
-    public String activar(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    public String activar(@PathVariable Integer id, @AuthenticationPrincipal CuentaUserDetails principal,
+                          RedirectAttributes redirectAttributes) {
         try {
-            administracion.activar(id);
+            administracion.activar(id, principal.getIdUsuario());
             redirectAttributes.addFlashAttribute("mensaje", "La cuenta quedó activa; el usuario también debe verificar su correo para iniciar sesión.");
         } catch (AdministracionUsuariosService.OperacionNoPermitidaException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -87,9 +91,10 @@ public class AdministracionUsuariosController {
 
     @PostMapping("/{id}/bloquear")
     public String bloquear(@PathVariable Integer id, Authentication authentication,
+                           @AuthenticationPrincipal CuentaUserDetails principal,
                            RedirectAttributes redirectAttributes) {
         try {
-            administracion.bloquear(id, authentication.getName());
+            administracion.bloquear(id, authentication.getName(), principal.getIdUsuario());
             redirectAttributes.addFlashAttribute("mensaje", "La cuenta quedó bloqueada y sus sesiones fueron cerradas.");
         } catch (AdministracionUsuariosService.OperacionNoPermitidaException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
