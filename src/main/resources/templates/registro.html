@@ -17,6 +17,15 @@
         <div th:if="${registroExitoso}" class="alert alert-success" role="status">
             Creamos tu cuenta. Revisa tu correo y confirma el enlace; después, el superadministrador debe activarla para que puedas iniciar sesión.
         </div>
+        <div th:if="${reenviarVerificacionSolicitado}" class="alert alert-info" role="status">
+            Si existe una cuenta pendiente con ese correo, enviaremos un nuevo enlace de verificación. Revisa también la carpeta de correo no deseado.
+        </div>
+        <form th:action="@{/registro/reenviar-verificacion}" method="post" class="form-grid" style="margin-bottom:20px">
+            <div class="field"><label for="correoReenvio">¿No recibiste el enlace?</label>
+                <input id="correoReenvio" type="email" name="correo" required maxlength="254" autocomplete="email" placeholder="El correo con el que creaste la cuenta">
+                <small class="field-hint">Solicita que te enviemos otra vez el enlace de activación.</small></div>
+            <button class="button button-secondary" type="submit">Reenviar verificación</button>
+        </form>
         <form th:action="@{/registro}" th:object="${registro}" method="post">
             <div class="field">
                 <label for="identificacion">Identificación</label>

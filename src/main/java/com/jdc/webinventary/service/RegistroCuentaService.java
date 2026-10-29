@@ -30,6 +30,15 @@ public class RegistroCuentaService {
     }
 
     @Transactional
+    public void reenviarVerificacion(String correo) {
+        if (correo == null || correo.isBlank()) return;
+        usuariosRepository.findByCorreoIgnoreCase(correo.trim())
+                .filter(usuario -> !"SI".equalsIgnoreCase(usuario.getVerificado()))
+                .filter(usuario -> !"BLOQUEADA".equalsIgnoreCase(usuario.getEstadoCuenta()))
+                .ifPresent(verificacionCorreo::enviarEnlace);
+    }
+
+    @Transactional
     public void registrar(RegistroCuentaForm form) {
         UsuariosEntity usuario = new UsuariosEntity();
         usuario.setIdentificacion(form.getIdentificacion().trim());
