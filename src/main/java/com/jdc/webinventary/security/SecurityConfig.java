@@ -51,15 +51,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/registro", "/registro/**", "/login", "/verificar-correo", "/recuperar-acceso/**", "/error", "/images/**", "/css/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("SUPERADMIN")
-
                         .requestMatchers("/reportes", "/reportes/**").hasRole("SUPERADMIN")
-                        .requestMatchers("/dashboard/financiero", "/dashboard/financiero/**")
-                        .hasAnyRole("SUPERADMIN", "ADMINISTRADOR")
-
                         .requestMatchers("/dashboard/financiero", "/dashboard/financiero/**",
                                 "/dashboard/comercial", "/dashboard/comercial/**",
                                 "/dashboard/inventario", "/dashboard/inventario/**",
-                                "/compras", "/compras/**", "/proveedores", "/proveedores/**")
+                                "/compras", "/compras/**")
+                        .hasRole("SUPERADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/proveedores", "/proveedores/**")
+                        .hasRole("SUPERADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/productos/*/editar")
                         .hasRole("SUPERADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/productos/**")
                         .hasRole("SUPERADMIN")
