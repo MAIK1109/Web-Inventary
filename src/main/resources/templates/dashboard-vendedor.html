@@ -16,6 +16,7 @@
     </section>
     <section class="action-grid" style="margin:20px 0">
         <article class="info-card"><p class="eyebrow">Aportes confirmados</p><h2 th:text="${resumen.aportesConfirmados}">0</h2><p th:text="|${resumen.cantidadAportesConfirmados} aportes aprobados|"></p></article>
+        <article class="info-card"><p class="eyebrow">Aportes pendientes</p><h2 th:text="${resumen.aportesPendientes}">0</h2><p th:text="|${resumen.cantidadAportesPendientes} aportes por revisar|"></p></article>
         <article class="info-card"><p class="eyebrow">Ventas confirmadas</p><h2 th:text="${resumen.ventas}">0</h2><p th:text="|${resumen.cantidadVentas} ventas|"></p></article>
     </section>
     <section class="action-grid" style="margin-bottom:20px">
