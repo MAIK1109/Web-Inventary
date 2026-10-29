@@ -7,20 +7,21 @@
     <header class="page-heading"><p class="eyebrow">Consulta y exportación</p><h1>Reportes de ventas</h1>
         <p>Filtra por período, producto, cliente y, según tu rol, vendedor. Los usuarios consultan únicamente sus ventas.</p></header>
     <div th:if="${error}" class="alert alert-error" th:text="${error}" role="alert"></div>
-    <section class="table-card">
-        <form method="get" th:action="@{/reportes}" class="form-grid">
-            <label>Desde<input type="date" name="desde" th:value="${desde}" required></label>
-            <label>Hasta<input type="date" name="hasta" th:value="${hasta}" required></label>
-            <label>Producto<select name="productoId"><option value="">Todos</option>
+    <section class="form-card report-filter-card">
+        <div class="report-filter-heading"><h2>Filtros del reporte</h2><p>Selecciona el período y los datos que quieres consultar.</p></div>
+        <form method="get" th:action="@{/reportes}" class="report-filter-grid">
+            <div class="field"><label for="desde">Desde</label><input id="desde" type="date" name="desde" th:value="${desde}" required></div>
+            <div class="field"><label for="hasta">Hasta</label><input id="hasta" type="date" name="hasta" th:value="${hasta}" required></div>
+            <div class="field"><label for="productoId">Producto</label><select id="productoId" name="productoId"><option value="">Todos</option>
                 <option th:each="producto : ${productos}" th:value="${producto.idProducto}" th:selected="${producto.idProducto == productoId}" th:text="|${producto.codigo} — ${producto.nombre}|"></option>
-            </select></label>
-            <label>Cliente<select name="clienteId"><option value="">Todos</option>
+            </select></div>
+            <div class="field"><label for="clienteId">Cliente</label><select id="clienteId" name="clienteId"><option value="">Todos</option>
                 <option th:each="cliente : ${clientes}" th:value="${cliente.idCliente}" th:selected="${cliente.idCliente == clienteId}" th:text="${cliente.nombre}"></option>
-            </select></label>
-            <label th:if="${puedeVerTodos}">Vendedor<select name="vendedorId"><option value="">Todos</option>
+            </select></div>
+            <div class="field" th:if="${puedeVerTodos}"><label for="vendedorId">Vendedor</label><select id="vendedorId" name="vendedorId"><option value="">Todos</option>
                 <option th:each="vendedor : ${vendedores}" th:value="${vendedor.idUsuario}" th:selected="${vendedor.idUsuario == vendedorId}" th:text="${vendedor.nombre}"></option>
-            </select></label>
-            <button class="button button-primary" type="submit">Aplicar filtros</button>
+            </select></div>
+            <div class="report-filter-action"><button class="button button-primary" type="submit">Aplicar filtros</button></div>
         </form>
     </section>
     <section class="action-grid" style="margin:20px 0">
