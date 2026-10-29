@@ -33,6 +33,7 @@
                     </div>
                 </details>
                 <a th:if="${isLoggedIn}" th:href="@{/busqueda}">Búsqueda</a>
+                <a th:if="${isLoggedIn}" th:href="@{/reportes}">Reportes</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/usuarios}">Usuarios</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/aportes}">Aportes</a>
                 <a th:if="${isSuperadmin}" th:href="@{/admin/anulaciones}">Anulaciones</a>
