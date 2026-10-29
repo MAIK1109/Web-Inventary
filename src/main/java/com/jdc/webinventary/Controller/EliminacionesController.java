@@ -1,6 +1,7 @@
 package com.jdc.webinventary.Controller;
 
 import com.jdc.webinventary.dto.MotivoAnulacionForm;
+import com.jdc.webinventary.entity.VentasEntity;
 import com.jdc.webinventary.security.CuentaUserDetails;
 import com.jdc.webinventary.service.EliminacionRestringidaService;
 import jakarta.validation.Valid;
@@ -12,6 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 public class EliminacionesController {
     private final EliminacionRestringidaService eliminaciones;
@@ -21,11 +25,21 @@ public class EliminacionesController {
     @GetMapping("/admin/anulaciones")
     public String historial(Model model) {
         model.addAttribute("anulaciones", eliminaciones.historial());
+        var ventasConfirmadas = eliminaciones.ventasConfirmadasParaAnular();
+        Map<Integer, Long> totalesVentas = new HashMap<>();
+        for (VentasEntity venta : ventasConfirmadas) {
+            long total = venta.getDetalles().stream().mapToLong(detalle ->
+                    (long) (detalle.getCantidad() == null ? 0 : detalle.getCantidad())
+                            * (detalle.getPrecioUnitario() == null ? 0 : detalle.getPrecioUnitario())).sum();
+            totalesVentas.put(venta.getIdVenta(), total);
+        }
+        model.addAttribute("ventasConfirmadas", ventasConfirmadas);
+        model.addAttribute("totalesVentas", totalesVentas);
         return "admin/anulaciones";
     }
 
-    @PostMapping("/admin/anulaciones/{tipo}/{id}")
-    public String anular(@PathVariable String tipo, @PathVariable Integer id,
+    @PostMapping("/admin/anulaciones/venta/{id}")
+    public String anularVenta(@PathVariable Integer id,
                          @Valid @ModelAttribute("form") MotivoAnulacionForm form,
                          BindingResult binding, @AuthenticationPrincipal CuentaUserDetails principal,
                          RedirectAttributes redirect) {
@@ -34,8 +48,8 @@ public class EliminacionesController {
             return "redirect:/admin/anulaciones";
         }
         try {
-            eliminaciones.anular(tipo, id, form.getMotivo(), principal.getIdUsuario());
-            redirect.addFlashAttribute("mensaje", tipo + " " + id + " anulada con trazabilidad.");
+            eliminaciones.anularVenta(id, form.getMotivo(), principal.getIdUsuario());
+            redirect.addFlashAttribute("mensaje", "Venta " + id + " anulada con trazabilidad.");
         } catch (IllegalArgumentException ex) { redirect.addFlashAttribute("error", ex.getMessage()); }
         return "redirect:/admin/anulaciones";
     }

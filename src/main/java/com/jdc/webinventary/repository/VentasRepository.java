@@ -20,6 +20,9 @@ public interface VentasRepository extends JpaRepository<VentasEntity, Integer> {
     List<VentasEntity> findAllByOrderByFechaDesc();
 
     @EntityGraph(attributePaths = {"cliente", "vendedor", "detalles", "detalles.producto"})
+    List<VentasEntity> findAllByEstadoOrderByFechaDesc(Byte estado);
+
+    @EntityGraph(attributePaths = {"cliente", "vendedor", "detalles", "detalles.producto"})
     @Query("select v from VentasEntity v where v.idVenta = :id")
     Optional<VentasEntity> buscarParaAnular(@Param("id") Integer id);
 
