@@ -88,7 +88,7 @@ public class ReportesController {
 
     private boolean puedeVerTodos(CuentaUserDetails principal) {
         return principal.getAuthorities().stream().anyMatch(a ->
-                "ROLE_SUPERADMIN".equals(a.getAuthority()) || "ROLE_ADMINISTRADOR".equals(a.getAuthority()));
+                "ROLE_SUPERADMIN".equals(a.getAuthority()));
     }
 
     private void cargarFiltros(Model model, ReportesService.Resultado resultado, Integer productoId,
